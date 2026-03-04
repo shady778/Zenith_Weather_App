@@ -54,6 +54,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
+    implementation(libs.play.services.location)
 
     // 2. Compose BOM (Bill of Materials) - EL MONYAFEESTO
     val composeBom = platform("androidx.compose:compose-bom:2024.02.01")
