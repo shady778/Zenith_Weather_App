@@ -1,0 +1,47 @@
+package com.example.zenith.presenters.home.viewmodel
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.zenith.data.model.WeatherData
+import com.example.zenith.data.repo.WeatherRepository
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
+
+data class WeatherUiState(
+    val isLoading: Boolean = false,
+    val data: WeatherData? = null,
+    val error: String? = null
+)
+
+class WeatherViewModel(private val repository: WeatherRepository) : ViewModel() {
+
+    private val _uiState = MutableStateFlow(WeatherUiState())
+    val uiState: StateFlow<WeatherUiState> = _uiState.asStateFlow()
+
+    private val _errorEvents = MutableSharedFlow<String>()
+    val errorEvents = _errorEvents.asSharedFlow()
+
+    fun fetchWeather(lat: Double, lon: Double) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, error = null) }
+
+            repository.getWeatherData(lat, lon).collect { result ->
+                result.fold(
+                    onSuccess = { weatherData ->
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                data = weatherData,
+                                error = null
+                            )
+                        }
+                    },
+                    onFailure = { exception ->
+                        val errorMessage = exception.localizedMessage ?: "An unexpected error occurred"
+                        _uiState.update { it.copy(isLoading = false, error = errorMessage) }
+                        _errorEvents.emit(errorMessage)
+                    }
+                )
+            }
+        }
+    }
+}

@@ -34,6 +34,8 @@ fun mapResponseToData(current: WeatherResponse, forecast: ForecastResponse): Wea
         country = current.sys.country,
         temperature = "${current.main.temp.toInt()}°",
         description = current.weather[0].description,
+        clouds = "${current.clouds.all}",
+        pressure = "${current.main.pressure}",
         icon = current.weather[0].icon,
         humidity = "${current.main.humidity}%",
         windSpeed = "${current.wind.speed} km/h",
