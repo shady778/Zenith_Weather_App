@@ -1,6 +1,5 @@
 package com.example.zenith.data.model
 
-
 data class WeatherData(
     val localTime: String,
     val city: String,
@@ -10,6 +9,8 @@ data class WeatherData(
     val icon: String,
     val humidity: String,
     val windSpeed: String,
+    val clouds: String,
+    val pressure: String,
     val hourlyForecast: List<HourlyForecast>,
     val dailyForecast: List<DailyForecast>,
     val isDay: Boolean

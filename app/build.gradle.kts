@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.weatherappfinal"
+    namespace = "com.example.zenith"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.Zenith"
+        applicationId = "com.example.zenith"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
@@ -74,6 +74,8 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
     implementation("com.squareup.retrofit2:converter-gson:2.11.0")
     implementation("io.coil-kt:coil-compose:2.6.0")
+    implementation("io.coil-kt:coil-svg:2.6.0")
+    implementation("com.airbnb.android:lottie-compose:6.4.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.4")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.4")
 
