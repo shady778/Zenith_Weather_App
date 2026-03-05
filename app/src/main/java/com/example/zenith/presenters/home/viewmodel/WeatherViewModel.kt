@@ -1,4 +1,5 @@
 package com.example.zenith.presenters.home.viewmodel
+
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.zenith.data.model.WeatherData
@@ -8,8 +9,8 @@ import kotlinx.coroutines.launch
 
 data class WeatherUiState(
     val isLoading: Boolean = false,
-    val data: WeatherData? = null,
-    val error: String? = null
+    val weatherData: WeatherData? = null,
+    val errorMessage: String? = null
 )
 
 class WeatherViewModel(private val repository: WeatherRepository) : ViewModel() {
@@ -20,28 +21,38 @@ class WeatherViewModel(private val repository: WeatherRepository) : ViewModel() 
     private val _errorEvents = MutableSharedFlow<String>()
     val errorEvents = _errorEvents.asSharedFlow()
 
-    fun fetchWeather(lat: Double, lon: Double) {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = null) }
+    init {
+        fetchWeather()
+    }
 
-            repository.getWeatherData(lat, lon).collect { result ->
-                result.fold(
-                    onSuccess = { weatherData ->
-                        _uiState.update {
-                            it.copy(
-                                isLoading = false,
-                                data = weatherData,
-                                error = null
-                            )
+    fun fetchWeather() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+
+            repository.getWeatherData()
+                .catch { exception ->
+                    val errorMsg = exception.localizedMessage ?: "Location or Network error"
+                    _uiState.update { it.copy(isLoading = false, errorMessage = errorMsg) }
+                    _errorEvents.emit(errorMsg)
+                }
+                .collect { result ->
+                    result.fold(
+                        onSuccess = { data ->
+                            _uiState.update {
+                                it.copy(
+                                    isLoading = false,
+                                    weatherData = data,
+                                    errorMessage = null
+                                )
+                            }
+                        },
+                        onFailure = { exception ->
+                            val errorMsg = exception.localizedMessage ?: "Failed to fetch weather"
+                            _uiState.update { it.copy(isLoading = false, errorMessage = errorMsg) }
+                            _errorEvents.emit(errorMsg)
                         }
-                    },
-                    onFailure = { exception ->
-                        val errorMessage = exception.localizedMessage ?: "An unexpected error occurred"
-                        _uiState.update { it.copy(isLoading = false, error = errorMessage) }
-                        _errorEvents.emit(errorMessage)
-                    }
-                )
-            }
+                    )
+                }
         }
     }
 }
