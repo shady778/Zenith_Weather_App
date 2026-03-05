@@ -9,20 +9,27 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.animation.Crossfade
+import androidx.compose.runtime.*
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.zenith.data.datasource.location.LocationProvider
 import com.example.zenith.data.datasource.remote.WeatherRemoteDataSource
 import com.example.zenith.data.network.RetrofitInstance
 import com.example.zenith.data.repo.WeatherRepository
 import com.example.zenith.presenters.home.view.WeatherHomeScreen
+import com.example.zenith.presenters.home.view.ui.components.ErrorScreen
 import com.example.zenith.presenters.home.viewmodel.WeatherViewModel
 import com.example.zenith.presenters.home.viewmodel.WeatherViewModelFactory
+import com.example.zenith.presenters.splash.view.SplashScreen
+import com.example.zenith.presenters.splash.viewmodel.SplashState
+import com.example.zenith.presenters.splash.viewmodel.SplashViewModel
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
@@ -33,13 +40,19 @@ class MainActivity : ComponentActivity() {
         val factory = WeatherViewModelFactory(repository)
 
         setContent {
-            val viewModel: WeatherViewModel = viewModel(factory = factory)
+            val splashViewModel: SplashViewModel = viewModel()
+            val weatherViewModel: WeatherViewModel = viewModel(factory = factory)
+            val splashState by splashViewModel.state.collectAsState()
+            val weatherUiState by weatherViewModel.uiState.collectAsState()
 
             val settingLauncher = rememberLauncherForActivityResult(
                 ActivityResultContracts.StartIntentSenderForResult()
             ) { result ->
                 if (result.resultCode == RESULT_OK) {
-                    viewModel.fetchWeather()
+                    splashViewModel.onLocationEnabled()
+                    weatherViewModel.fetchWeather()
+                } else {
+                    splashViewModel.updateState(SplashState.Error("Location service is required"))
                 }
             }
 
@@ -49,25 +62,68 @@ class MainActivity : ComponentActivity() {
                 val granted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
                         permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
                 if (granted) {
+                    splashViewModel.onPermissionsGranted()
                     checkLocationSettings(
-                        onEnabled = { viewModel.fetchWeather() },
+                        onEnabled = {
+                            splashViewModel.onLocationEnabled()
+                            weatherViewModel.fetchWeather()
+                        },
                         onDisabled = { intentSender ->
                             settingLauncher.launch(IntentSenderRequest.Builder(intentSender).build())
                         }
                     )
+                } else {
+                    splashViewModel.updateState(SplashState.Error("Location permission is required"))
                 }
             }
 
             LaunchedEffect(Unit) {
+                if (splashState is SplashState.Idle) {
+                    splashViewModel.updateState(SplashState.RequestingPermissions)
+                    permissionLauncher.launch(arrayOf(
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                    ))
+                }
+            }
+
+            LaunchedEffect(splashState, weatherUiState) {
+                if (splashState is SplashState.LoadingData) {
+                    if (weatherUiState.weatherData != null) {
+                        splashViewModel.updateState(SplashState.Ready)
+                    } else if (weatherUiState.errorMessage != null) {
+                        splashViewModel.updateState(SplashState.Error(weatherUiState.errorMessage!!))
+                    }
+                }
+            }
+
+            val onRetry = {
+                splashViewModel.updateState(SplashState.RequestingPermissions)
                 permissionLauncher.launch(arrayOf(
                     Manifest.permission.ACCESS_FINE_LOCATION,
                     Manifest.permission.ACCESS_COARSE_LOCATION
                 ))
             }
 
-            WeatherHomeScreen(viewModel = viewModel)
+            Crossfade(targetState = splashState, label = "screen_transition") { state ->
+                when (state) {
+                    is SplashState.Ready -> {
+                        WeatherHomeScreen(viewModel = weatherViewModel)
+                    }
+                    is SplashState.Error -> {
+                        ErrorScreen(
+                            message = (state as SplashState.Error).message,
+                            onRetry = onRetry
+                        )
+                    }
+                    else -> {
+                        SplashScreen(viewModel = splashViewModel)
+                    }
+                }
+            }
         }
     }
+
     private fun checkLocationSettings(
         onEnabled: () -> Unit,
         onDisabled: (IntentSender) -> Unit
@@ -82,9 +138,7 @@ class MainActivity : ComponentActivity() {
             if (exception is ResolvableApiException) {
                 try {
                     onDisabled(exception.resolution.intentSender)
-                } catch (sendEx: IntentSender.SendIntentException) {
-
-                }
+                } catch (sendEx: IntentSender.SendIntentException) { }
             }
         }
     }

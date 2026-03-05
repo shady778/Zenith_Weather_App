@@ -168,9 +168,6 @@ fun MainWeatherCard(data: WeatherData, isDay: Boolean) {
     }
 }
 
-// ─────────────────────────────────────────────────────────────
-// Quick Stat
-// ─────────────────────────────────────────────────────────────
 @Composable
 fun QuickStat(icon: ImageVector, value: String, label: String, isDay: Boolean) {
     val textColor = if (isDay) Color.Black.copy(0.8f) else Color.White
@@ -181,9 +178,6 @@ fun QuickStat(icon: ImageVector, value: String, label: String, isDay: Boolean) {
     }
 }
 
-// ─────────────────────────────────────────────────────────────
-// Hourly Forecast Row — Lottie icons
-// ─────────────────────────────────────────────────────────────
 @Composable
 fun HourlyForecastRow(data: List<HourlyForecast>, isDay: Boolean) {
     Column {
@@ -220,9 +214,6 @@ fun HourlyForecastRow(data: List<HourlyForecast>, isDay: Boolean) {
     }
 }
 
-// ─────────────────────────────────────────────────────────────
-// Daily Forecast List — Lottie icons
-// ─────────────────────────────────────────────────────────────
 @Composable
 fun DailyForecastList(data: List<DailyForecast>, isDay: Boolean) {
     Column {
@@ -276,9 +267,6 @@ fun DailyForecastList(data: List<DailyForecast>, isDay: Boolean) {
     }
 }
 
-// ─────────────────────────────────────────────────────────────
-// Section Title
-// ─────────────────────────────────────────────────────────────
 @Composable
 fun SectionTitle(title: String, isDay: Boolean) {
     Text(
@@ -291,21 +279,17 @@ fun SectionTitle(title: String, isDay: Boolean) {
     )
 }
 
-// ─────────────────────────────────────────────────────────────
-// Weather Background
-// ─────────────────────────────────────────────────────────────
 @Composable
 fun WeatherBackground(isDay: Boolean, content: @Composable BoxScope.() -> Unit) {
     val animatedProgress by animateFloatAsState(targetValue = if (isDay) 1f else 0f, animationSpec = tween(1500), label = "")
 
     Box(modifier = Modifier.fillMaxSize()) {
         Canvas(modifier = Modifier.fillMaxSize()) {
-            val topColor = lerp(Color(0xFF0D1B2A), Color(0xFF4A90E2), animatedProgress)
-            val bottomColor = lerp(Color(0xFF1B263B), Color(0xFF87CEEB), animatedProgress)
+            val topColor = lerp(Color(0xFF050B18), Color(0xFF1565C0), animatedProgress)
+            val bottomColor = lerp(Color(0xFF0A1628), Color(0xFF1E88E5), animatedProgress)
             drawRect(brush = Brush.verticalGradient(listOf(topColor, bottomColor)))
         }
 
-        // Sun / Moon Lottie in background
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -324,9 +308,7 @@ fun WeatherBackground(isDay: Boolean, content: @Composable BoxScope.() -> Unit) 
     }
 }
 
-// ─────────────────────────────────────────────────────────────
-// Rain Animation (Canvas)
-// ─────────────────────────────────────────────────────────────
+
 @Composable
 fun RainAnimation() {
     val infiniteTransition = rememberInfiniteTransition(label = "")
@@ -349,9 +331,6 @@ fun RainAnimation() {
     }
 }
 
-// ─────────────────────────────────────────────────────────────
-// Color lerp helper
-// ─────────────────────────────────────────────────────────────
 fun lerp(start: Color, stop: Color, fraction: Float): Color = Color(
     red = start.red + (stop.red - start.red) * fraction,
     green = start.green + (stop.green - start.green) * fraction,
