@@ -1,4 +1,4 @@
-package com.example.zenith.presenters.home.view.ui.components
+package com.example.zenith.presenters.home.ui
 
 import androidx.annotation.RawRes
 import androidx.compose.animation.core.*
