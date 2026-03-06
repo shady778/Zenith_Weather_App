@@ -1,19 +1,20 @@
 package com.example.zenith.data.repo
 
+import com.example.zenith.data.datasource.local.FavoriteCityEntity
+import com.example.zenith.data.datasource.local.FavoriteLocalDataSource
 import com.example.zenith.data.datasource.location.LocationProvider
 import com.example.zenith.data.datasource.remote.WeatherRemoteDataSource
 import com.example.zenith.data.model.WeatherData
 import com.example.zenith.data.model.mapResponseToData
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flatMap
-import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 
 class WeatherRepository(
     private val remoteDataSource: WeatherRemoteDataSource,
-    private val locationProvider: LocationProvider
+    private val locationProvider: LocationProvider,
+    private val localDataSource: FavoriteLocalDataSource
 ) {
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -30,7 +31,18 @@ class WeatherRepository(
                     emit(Result.failure(e))
                 }
             }
+
         }
+    }
+    val allFavorites: Flow<List<FavoriteCityEntity>> =
+        localDataSource.allFavorites
+
+    suspend fun insert(city: FavoriteCityEntity) {
+        localDataSource.insertCity(city)
+    }
+
+    suspend fun delete(city: FavoriteCityEntity) {
+        localDataSource.deleteCity(city)
     }
 
 }
