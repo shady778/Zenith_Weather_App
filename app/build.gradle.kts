@@ -81,6 +81,8 @@ dependencies {
     implementation("com.airbnb.android:lottie-compose:6.4.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.4")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.4")
+    implementation("org.osmdroid:osmdroid-android:6.1.18")
+
 
     // 5. Testing
     testImplementation(libs.junit)
