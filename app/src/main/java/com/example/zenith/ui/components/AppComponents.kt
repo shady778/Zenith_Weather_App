@@ -42,6 +42,35 @@ fun GlassCard(
 }
 
 @Composable
+fun ZenithTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    placeholder: String,
+    modifier: Modifier = Modifier,
+) {
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(text = label, fontSize = 12.sp, fontWeight = FontWeight.Medium, color = ZenithColors.TextSecondary)
+        OutlinedTextField(
+            value = value,
+            onValueChange = onValueChange,
+            placeholder = { Text(placeholder, color = ZenithColors.TextDisabled, fontSize = 14.sp) },
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedContainerColor = ZenithColors.SurfaceGlass,
+                unfocusedContainerColor = ZenithColors.SurfaceGlass,
+                focusedBorderColor = ZenithColors.Cyan.copy(alpha = 0.5f),
+                unfocusedBorderColor = ZenithColors.BorderGlass,
+                focusedTextColor = ZenithColors.TextPrimary,
+                unfocusedTextColor = ZenithColors.TextPrimary,
+            ),
+            singleLine = true
+        )
+    }
+}
+
+@Composable
 fun ZenithTopBar(
     title: String,
     subtitle: String? = null,

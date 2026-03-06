@@ -12,6 +12,7 @@ import com.example.zenith.presenters.home.viewmodel.WeatherViewModel
 fun ZenithNavGraph(
     navController: NavHostController,
     weatherViewModel: WeatherViewModel,
+    isDay: Boolean,
     modifier: Modifier = Modifier
 ) {
     NavHost(
@@ -23,7 +24,7 @@ fun ZenithNavGraph(
             HomeScreen(viewModel = weatherViewModel)
         }
         composable(Screen.Favorites.route) {
-
+            com.example.zenith.presenters.favorites.view.FavoritesScreen(isDay = isDay)
         }
         composable(Screen.Alerts.route) {
         }

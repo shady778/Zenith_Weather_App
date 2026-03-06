@@ -41,6 +41,7 @@ fun MainScreen(weatherViewModel: WeatherViewModel) {
         ZenithNavGraph(
             navController = navController,
             weatherViewModel = weatherViewModel,
+            isDay = isDay,
             modifier = Modifier.padding(innerPadding)
         )
     }

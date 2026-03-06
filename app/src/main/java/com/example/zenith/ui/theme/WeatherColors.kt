@@ -9,6 +9,8 @@ object ZenithColors {
     val TextPrimary = Color(0xFFFFFFFF)
     val TextSecondary = Color(0xB3FFFFFF)
     val Background = Color(0xFF050B18)
+    val BackgroundAlt = Color(0xFF0F172A)
+    val TextDisabled = Color(0x66FFFFFF)
 }
 
 object DayColors {
