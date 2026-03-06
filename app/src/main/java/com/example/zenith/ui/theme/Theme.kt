@@ -1,4 +1,4 @@
-package com.example.Zenith.presenters.home.view.ui.theme
+package com.example.zenith.ui.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -33,7 +33,7 @@ private val LightColorScheme = lightColorScheme(
 )
 
 @Composable
-fun WeatherAppfinalTheme(
+fun ZenithTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,

@@ -1,4 +1,4 @@
-package com.example.Zenith.presenters.home.view.ui.theme
+package com.example.zenith.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

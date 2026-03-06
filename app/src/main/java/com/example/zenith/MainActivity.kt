@@ -17,8 +17,8 @@ import com.example.zenith.data.datasource.location.LocationProvider
 import com.example.zenith.data.datasource.remote.WeatherRemoteDataSource
 import com.example.zenith.data.network.RetrofitInstance
 import com.example.zenith.data.repo.WeatherRepository
-import com.example.zenith.presenters.home.view.WeatherHomeScreen
-import com.example.zenith.presenters.home.view.ui.components.ErrorScreen
+import com.example.zenith.presenters.home.ui.ErrorScreen
+import com.example.zenith.ui.theme.ZenithTheme
 import com.example.zenith.presenters.home.viewmodel.WeatherViewModel
 import com.example.zenith.presenters.home.viewmodel.WeatherViewModelFactory
 import com.example.zenith.presenters.splash.view.SplashScreen
@@ -97,33 +97,34 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-            val onRetry = {
-                splashViewModel.updateState(SplashState.RequestingPermissions)
-                permissionLauncher.launch(arrayOf(
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                ))
-            }
+            ZenithTheme {
+                val onRetry = {
+                    splashViewModel.updateState(SplashState.RequestingPermissions)
+                    permissionLauncher.launch(arrayOf(
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                    ))
+                }
 
-            Crossfade(targetState = splashState, label = "screen_transition") { state ->
-                when (state) {
-                    is SplashState.Ready -> {
-                        WeatherHomeScreen(viewModel = weatherViewModel)
-                    }
-                    is SplashState.Error -> {
-                        ErrorScreen(
-                            message = (state as SplashState.Error).message,
-                            onRetry = onRetry
-                        )
-                    }
-                    else -> {
-                        SplashScreen(viewModel = splashViewModel)
+                Crossfade(targetState = splashState, label = "screen_transition") { state ->
+                    when (state) {
+                        is SplashState.Ready -> {
+                            MainScreen(weatherViewModel = weatherViewModel)
+                        }
+                        is SplashState.Error -> {
+                            ErrorScreen(
+                                message = (state as SplashState.Error).message,
+                                onRetry = onRetry
+                            )
+                        }
+                        else -> {
+                            SplashScreen(viewModel = splashViewModel)
+                        }
                     }
                 }
             }
         }
     }
-
     private fun checkLocationSettings(
         onEnabled: () -> Unit,
         onDisabled: (IntentSender) -> Unit
