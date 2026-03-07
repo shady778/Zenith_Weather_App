@@ -12,6 +12,7 @@ import com.example.zenith.presenters.home.viewmodel.WeatherViewModel
 import com.example.zenith.presenters.favorites.view.FavoritesScreen
 import com.example.zenith.presenters.favorites.viewmodel.FavoriteViewModel
 import com.example.zenith.presenters.home.viewmodel.WeatherUiState
+import com.example.zenith.presenters.settings.view.SettingsScreen
 import kotlinx.coroutines.flow.StateFlow
 
 
@@ -48,6 +49,7 @@ fun ZenithNavGraph(
         composable(Screen.Alerts.route) {
         }
         composable(Screen.Settings.route) {
+            SettingsScreen(isDay = isDay)
         }
     }
 }
