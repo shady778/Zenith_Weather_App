@@ -10,6 +10,9 @@ import androidx.navigation.compose.rememberNavController
 import com.example.zenith.presenters.home.viewmodel.WeatherViewModel
 import com.example.zenith.presenters.navigation.ZenithNavGraph
 import com.example.zenith.presenters.navigation.ZenithBottomNav
+import com.example.zenith.presenters.favorites.viewmodel.FavoriteViewModel
+import com.example.zenith.presenters.favorites.viewmodel.FavoriteViewModelFactory
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 
 @Composable
@@ -17,6 +20,10 @@ fun MainScreen(weatherViewModel: WeatherViewModel) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
+
+    val favoriteViewModel: FavoriteViewModel = viewModel(
+        factory = FavoriteViewModelFactory(weatherViewModel.repository) 
+    )
 
     val uiState by weatherViewModel.uiState.collectAsState()
     val isDay = uiState.weatherData?.isDay ?: false
@@ -41,6 +48,7 @@ fun MainScreen(weatherViewModel: WeatherViewModel) {
         ZenithNavGraph(
             navController = navController,
             weatherViewModel = weatherViewModel,
+            favoriteViewModel = favoriteViewModel,
             isDay = isDay,
             modifier = Modifier.padding(innerPadding)
         )

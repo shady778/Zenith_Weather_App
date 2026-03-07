@@ -13,7 +13,7 @@ data class WeatherUiState(
     val errorMessage: String? = null
 )
 
-class WeatherViewModel(private val repository: WeatherRepository) : ViewModel() {
+class WeatherViewModel(val repository: WeatherRepository) : ViewModel() {
 
     private val _uiState = MutableStateFlow(WeatherUiState())
     val uiState: StateFlow<WeatherUiState> = _uiState.asStateFlow()
@@ -50,6 +50,27 @@ class WeatherViewModel(private val repository: WeatherRepository) : ViewModel() 
                             val errorMsg = exception.localizedMessage ?: "Failed to fetch weather"
                             _uiState.update { it.copy(isLoading = false, errorMessage = errorMsg) }
                             _errorEvents.emit(errorMsg)
+                        }
+                    )
+                }
+        }
+    }
+
+    fun fetchWeatherForLocation(lat: Double, lon: Double) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            repository.getWeatherDataForLocation(lat, lon)
+                .catch { exception ->
+                    val errorMsg = exception.localizedMessage ?: "Network error"
+                    _uiState.update { it.copy(isLoading = false, errorMessage = errorMsg) }
+                }
+                .collect { result ->
+                    result.fold(
+                        onSuccess = { data ->
+                            _uiState.update { it.copy(isLoading = false, weatherData = data) }
+                        },
+                        onFailure = { exception ->
+                            _uiState.update { it.copy(isLoading = false, errorMessage = exception.localizedMessage) }
                         }
                     )
                 }

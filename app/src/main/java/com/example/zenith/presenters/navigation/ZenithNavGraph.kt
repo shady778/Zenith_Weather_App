@@ -1,19 +1,28 @@
 package com.example.zenith.presenters.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.zenith.presenters.home.ui.HomeScreen
 import com.example.zenith.presenters.home.viewmodel.WeatherViewModel
+import com.example.zenith.presenters.favorites.view.FavoritesScreen
+import com.example.zenith.presenters.favorites.viewmodel.FavoriteViewModel
+import com.example.zenith.presenters.home.viewmodel.WeatherUiState
+import kotlinx.coroutines.flow.StateFlow
+
 
 @Composable
 fun ZenithNavGraph(
     navController: NavHostController,
     weatherViewModel: WeatherViewModel,
+    favoriteViewModel: FavoriteViewModel,
     isDay: Boolean,
     modifier: Modifier = Modifier
+
 ) {
     NavHost(
         navController = navController,
@@ -24,11 +33,23 @@ fun ZenithNavGraph(
             HomeScreen(viewModel = weatherViewModel)
         }
         composable(Screen.Favorites.route) {
-            com.example.zenith.presenters.favorites.view.FavoritesScreen(isDay = isDay)
+            val weatherUiState = weatherViewModel.uiState.collectAsState().value
+
+            FavoritesScreen(
+                viewModel = favoriteViewModel, 
+                isDay = isDay,
+                currentWeather = weatherUiState.weatherData,
+                onCitySelected = { lat, lon ->
+                    favoriteViewModel.viewDetail(lat, lon)
+                }
+            )
         }
+
         composable(Screen.Alerts.route) {
         }
         composable(Screen.Settings.route) {
         }
     }
 }
+
+

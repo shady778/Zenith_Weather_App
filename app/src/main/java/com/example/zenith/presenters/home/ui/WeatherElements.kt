@@ -198,7 +198,6 @@ fun HourlyForecastRow(data: List<HourlyForecast>, isDay: Boolean) {
                         color = if (isDay) Color.Black else Color.White,
                         style = MaterialTheme.typography.labelMedium
                     )
-                    // 🎯 Lottie بدل AsyncImage
                     WeatherLottieIcon(
                         iconCode = item.icon,
                         modifier = Modifier.size(44.dp)
@@ -238,7 +237,6 @@ fun DailyForecastList(data: List<DailyForecast>, isDay: Boolean) {
                         fontWeight = FontWeight.Bold,
                         color = if (isDay) Color.Black else Color.White
                     )
-                    // 🎯 Lottie بدل AsyncImage
                     WeatherLottieIcon(
                         iconCode = item.icon,
                         modifier = Modifier

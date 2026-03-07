@@ -1,148 +1,203 @@
 package com.example.zenith.presenters.favorites.view
 
 import androidx.compose.animation.*
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.zenith.presenters.favorites.viewmodel.*
-import com.example.zenith.ui.components.ZenithTopBar
+import com.example.zenith.data.datasource.local.FavoriteCityEntity
+import com.example.zenith.presenters.favorites.viewmodel.FavoriteUiState
+import com.example.zenith.presenters.favorites.viewmodel.FavoriteCity
 import com.example.zenith.ui.theme.ZenithColors
-import com.example.zenith.presenters.home.ui.WeatherBackground
-import androidx.compose.ui.graphics.Color
+import com.example.zenith.ui.components.ZenithDeleteDialog
+import com.example.zenith.ui.components.WeatherDetailsDialog
+import com.example.zenith.data.model.WeatherData
+import com.example.zenith.presenters.favorites.viewmodel.FavoriteViewModel
 
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FavoritesScreen(isDay: Boolean) {
-    var cities by remember { mutableStateOf(sampleCities) }
-    var showAddDialog by remember { mutableStateOf(false) }
-    var showCelsius by remember { mutableStateOf(true) }
-    val interactionSource = remember { MutableInteractionSource() }
-    val selectionInteractionSource = remember { MutableInteractionSource() }
+fun FavoritesScreen(
+    viewModel: FavoriteViewModel,
+    isDay: Boolean,
+    currentWeather: WeatherData? = null,
+    onCitySelected: (Double, Double) -> Unit
+) {
+    val uiState by viewModel.uiState.collectAsState()
+    val detailState by viewModel.detailState.collectAsState()
+    var showMapPicker by remember { mutableStateOf(false) }
+    var cityToDelete by remember { mutableStateOf<FavoriteCity?>(null) }
 
 
-    WeatherBackground(isDay = isDay) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                Brush.verticalGradient(
+                    colors = if (isDay) listOf(Color(0xFF1565C0), Color(0xFF1E88E5))
+                    else listOf(Color(0xFF050B18), Color(0xFF0A1628))
+                )
+            )
+    ) {
         Scaffold(
             containerColor = Color.Transparent,
-            floatingActionButton = {
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .size(60.dp)
-                        .clip(CircleShape)
-                        .background(
-                            Brush.radialGradient(
-                                colors = listOf(
-                                    ZenithColors.Cyan,
-                                    ZenithColors.Cyan.copy(alpha = 0.8f)
-                                )
-                            )
+            topBar = {
+                CenterAlignedTopAppBar(
+                    title = {
+                        Text(
+                            "Favorite Cities",
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
                         )
-                        .clickable(
-                            interactionSource = interactionSource,
-                            indication = null,
-                            onClick = { showAddDialog = true }
-                        )
-                ) {
-                    Icon(
-                        Icons.Rounded.Add,
-                        contentDescription = "Add",
-                        tint = ZenithColors.Background,
-                        modifier = Modifier.size(28.dp)
+                    },
+                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                        containerColor = Color.Transparent
                     )
+                )
+            },
+            floatingActionButton = {
+                FloatingActionButton(
+                    onClick = { showMapPicker = true },
+                    containerColor = ZenithColors.Cyan,
+                    contentColor = ZenithColors.Background,
+                    shape = CircleShape,
+                    modifier = Modifier.padding(bottom = 16.dp, end = 8.dp)
+                ) {
+                    Icon(Icons.Rounded.Add, contentDescription = "Add City", modifier = Modifier.size(32.dp))
                 }
             }
         ) { padding ->
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-            ) {
-                ZenithTopBar(
-                    title = "Favorites",
-                    subtitle = "${cities.size} cities saved",
-                    actions = {
-                        Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(12.dp))
-                                .background(ZenithColors.SurfaceGlass)
-                                .border(1.dp, ZenithColors.BorderGlass, RoundedCornerShape(12.dp))
-                                .clickable(
-                                    interactionSource = selectionInteractionSource,
-                                    indication = null,
-                                    onClick = { showCelsius = !showCelsius }
-                                )
-                                .padding(horizontal = 14.dp, vertical = 8.dp)
+            Box(modifier = Modifier.padding(padding).fillMaxSize()) {
+                when (val state = uiState) {
+                    is FavoriteUiState.Loading -> {
+                        CircularProgressIndicator(
+                            modifier = Modifier.align(Alignment.Center),
+                            color = ZenithColors.Cyan
+                        )
+                    }
+                    is FavoriteUiState.Empty -> {
+                        EmptyState(modifier = Modifier.align(Alignment.Center))
+                    }
+                    is FavoriteUiState.Success -> {
+                        LazyColumn(
+                            contentPadding = PaddingValues(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
+                            modifier = Modifier.fillMaxSize()
                         ) {
-                            Text(
-                                text = if (showCelsius) "°C" else "°F",
-                                fontSize = 13.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                color = ZenithColors.Cyan
-                            )
+                            items(state.cities) { city ->
+                                CityCard(
+                                    city = city,
+                                    showCelsius = true,
+                                    onClick = { 
+                                        onCitySelected(city.entity.lat, city.entity.lon)
+                                    },
+                                    onDelete = { cityToDelete = city }
+                                )
+                            }
+
                         }
                     }
-                )
-                LazyColumn(
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp),
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    itemsIndexed(cities) { index, city ->
-                        AnimatedVisibility(
-                            visible = true,
-                            enter = fadeIn(tween(300, delayMillis = index * 60)) +
-                                    slideInVertically(
-                                        initialOffsetY = { it / 4 },
-                                        animationSpec = tween(300, delayMillis = index * 60)
-                                    )
-                        ) {
-                            CityCard(
-                                city = city,
-                                showCelsius = showCelsius,
-                                onDelete = { cities = cities.filterNot { it.id == city.id } }
-                            )
-                        }
+                    is FavoriteUiState.Error -> {
+                        Text(
+                            text = state.message,
+                            color = Color.Red,
+                            modifier = Modifier.align(Alignment.Center)
+                        )
                     }
                 }
             }
         }
 
-        if (showAddDialog) {
+        if (showMapPicker) {
             MapPicker(
-                onDismiss = { showAddDialog = false },
-                onLocationSelected = { name, country ->
-                    cities = cities + FavoriteCity(
-                        id = (cities.maxOfOrNull { it.id } ?: 0) + 1,
-                        name = name,
-                        country = country,
-                        tempC = (5..35).random(),
-                        condition = WeatherCondition.entries.random(),
-                        humidity = (20..38).random(),
-                        wind = (0..10).random(),
-                        localTime = "12:00 PM"
+                initialLat = if (currentWeather?.lat != 0.0) currentWeather?.lat ?: 30.0444 else 30.0444,
+                initialLon = if (currentWeather?.lon != 0.0) currentWeather?.lon ?: 31.2357 else 31.2357,
+                onDismiss = { showMapPicker = false },
+                onLocationSelected = { name, country, lat, lon ->
+                    viewModel.addCity(
+                        FavoriteCityEntity(
+                            name = name,
+                            country = country,
+                            lat = lat,
+                            lon = lon
+                        )
                     )
-
                 }
             )
         }
+
+        cityToDelete?.let { city ->
+            ZenithDeleteDialog(
+                cityName = city.name,
+                onDismiss = { cityToDelete = null },
+                onConfirm = { 
+                    viewModel.removeCity(city.entity)
+                }
+            )
+        }
+
+        detailState.weatherData?.let { data ->
+            WeatherDetailsDialog(
+                data = data,
+                onDismiss = { viewModel.clearDetail() }
+            )
+        }
+
+        if (detailState.isLoading) {
+            Box(modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.3f)), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator(color = ZenithColors.Cyan)
+            }
+        }
+    }
+}
+
+
+@Composable
+fun EmptyState(modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier.padding(40.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Surface(
+            modifier = Modifier.size(120.dp),
+            shape = CircleShape,
+            color = ZenithColors.SurfaceGlass
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                Icon(
+                    Icons.Rounded.Add,
+                    contentDescription = null,
+                    modifier = Modifier.size(60.dp),
+                    tint = ZenithColors.TextSecondary
+                )
+            }
+        }
+        Spacer(Modifier.height(24.dp))
+        Text(
+            "No Favorites Yet",
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.White
+        )
+        Spacer(Modifier.height(8.dp))
+        Text(
+            "Tap the + button to add your favorite cities and track their weather.",
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            color = ZenithColors.TextSecondary,
+            lineHeight = 22.sp
+        )
     }
 }
