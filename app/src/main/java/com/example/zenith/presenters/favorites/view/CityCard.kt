@@ -2,12 +2,15 @@ package com.example.zenith.presenters.favorites.view
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -22,11 +25,18 @@ import com.example.zenith.ui.components.GlassCard
 import com.example.zenith.ui.theme.ZenithColors
 
 @Composable
-fun CityCard(city: FavoriteCity, showCelsius: Boolean, onDelete: () -> Unit) {
-    val temp = if (showCelsius) "${city.tempC}°C" else "${(city.tempC * 9 / 5) + 32}°F"
+fun CityCard(city: FavoriteCity, showCelsius: Boolean, onClick: () -> Unit, onDelete: () -> Unit) {
+    val temp = if (showCelsius) "${city.tempC.toInt()}°C" else "${(city.tempC * 9 / 5).toInt() + 32}°F"
+
+    val interactionSource = remember { MutableInteractionSource() }
 
     GlassCard(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null
+            ) { onClick() },
         backgroundColor = city.condition.gradientStart.copy(alpha = 0.06f)
             .compositeOver(ZenithColors.SurfaceGlass)
     ) {
@@ -78,7 +88,7 @@ fun CityCard(city: FavoriteCity, showCelsius: Boolean, onDelete: () -> Unit) {
                     horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
                     Text(
-                        text = city.condition.label,
+                        text = city.description,
                         fontSize = 11.sp,
                         color = city.condition.tint.copy(alpha = 0.85f)
                     )

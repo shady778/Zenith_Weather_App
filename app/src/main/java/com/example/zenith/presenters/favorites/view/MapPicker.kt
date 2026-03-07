@@ -1,5 +1,6 @@
 package com.example.zenith.presenters.favorites.view
 
+import android.location.Geocoder
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -21,13 +22,30 @@ import com.example.zenith.ui.theme.ZenithColors
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.views.MapView
+import java.util.Locale
 
 @Composable
-fun MapPicker(onDismiss: () -> Unit, onLocationSelected: (String, String) -> Unit) {
+fun MapPicker(
+    initialLat: Double = 0.0,
+    initialLon: Double = 0.0,
+    onDismiss: () -> Unit,
+    onLocationSelected: (String, String, Double, Double) -> Unit
+) {
     val context = LocalContext.current
+    val mapView = remember { MapView(context) }
 
     LaunchedEffect(Unit) {
         Configuration.getInstance().load(context, context.getSharedPreferences("osmdroid", 0))
+        mapView.setTileSource(TileSourceFactory.MAPNIK)
+        mapView.setMultiTouchControls(true)
+        mapView.controller.setZoom(12.0)
+
+        val startPoint = if (initialLat != 0.0 && initialLon != 0.0) {
+            org.osmdroid.util.GeoPoint(initialLat, initialLon)
+        } else {
+            org.osmdroid.util.GeoPoint(30.0444, 31.2357)
+        }
+        mapView.controller.setCenter(startPoint)
     }
 
     Box(modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.7f))) {
@@ -38,13 +56,7 @@ fun MapPicker(onDismiss: () -> Unit, onLocationSelected: (String, String) -> Uni
         ) {
             Box(modifier = Modifier.fillMaxSize()) {
                 AndroidView(
-                    factory = { ctx ->
-                        MapView(ctx).apply {
-                            setTileSource(TileSourceFactory.MAPNIK)
-                            setMultiTouchControls(true)
-                            controller.setZoom(10.0)
-                        }
-                    },
+                    factory = { mapView },
                     modifier = Modifier.fillMaxSize()
                 )
 
@@ -66,7 +78,19 @@ fun MapPicker(onDismiss: () -> Unit, onLocationSelected: (String, String) -> Uni
                 )
 
                 Button(
-                    onClick = { onLocationSelected("Selected Point", "??") },
+                    onClick = {
+                        val center = mapView.mapCenter
+                        val geocoder = Geocoder(context, Locale.getDefault())
+                        try {
+                            val addresses = geocoder.getFromLocation(center.latitude, center.longitude, 1)
+                            val name = addresses?.firstOrNull()?.locality ?: "Unknown Location"
+                            val country = addresses?.firstOrNull()?.countryName ?: "Unknown"
+                            onLocationSelected(name, country, center.latitude, center.longitude)
+                        } catch (e: Exception) {
+                            onLocationSelected("Unknown", "Unknown", center.latitude, center.longitude)
+                        }
+                        onDismiss()
+                    },
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
                         .padding(bottom = 40.dp)

@@ -9,8 +9,12 @@ data class WeatherResponse(
     val wind: WindData,
     val clouds: Clouds,
     val sys: SysData,
-    val dt: Long
+    val dt: Long,
+    val timezone: Int,
+    val coord: CoordData? = null
 )
+
+data class CoordData(val lat: Double, val lon: Double)
 
 data class ForecastResponse(
     val list: List<ForecastItem>,

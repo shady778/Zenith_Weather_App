@@ -34,7 +34,25 @@ class WeatherRepository(
 
         }
     }
+
+    fun getWeatherDataForLocation(lat: Double, lon: Double): Flow<Result<WeatherData>> {
+        return flow {
+            try {
+                val current = remoteDataSource.getCurrentWeather(lat, lon)
+                val forecast = remoteDataSource.getForecast(lat, lon)
+                val mapped = mapResponseToData(current, forecast)
+                emit(Result.success(mapped))
+            } catch (e: Exception) {
+                emit(Result.failure(e))
+            }
+        }
+    }
+
+    suspend fun getCurrentWeather(lat: Double, lon: Double) = 
+        remoteDataSource.getCurrentWeather(lat, lon)
+
     val allFavorites: Flow<List<FavoriteCityEntity>> =
+
         localDataSource.allFavorites
 
     suspend fun insert(city: FavoriteCityEntity) {

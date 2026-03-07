@@ -13,7 +13,9 @@ data class WeatherData(
     val pressure: String,
     val hourlyForecast: List<HourlyForecast>,
     val dailyForecast: List<DailyForecast>,
-    val isDay: Boolean
+    val isDay: Boolean,
+    val lat: Double = 0.0,
+    val lon: Double = 0.0
 )
 
 data class HourlyForecast(

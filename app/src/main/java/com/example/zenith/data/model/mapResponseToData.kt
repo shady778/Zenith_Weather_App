@@ -41,6 +41,8 @@ fun mapResponseToData(current: WeatherResponse, forecast: ForecastResponse): Wea
         windSpeed = "${current.wind.speed} km/h",
         hourlyForecast = hourly,
         dailyForecast = daily,
-        isDay = current.weather[0].icon.contains("d")
+        isDay = current.weather[0].icon.contains("d"),
+        lat = current.coord?.lat ?: 0.0,
+        lon = current.coord?.lon ?: 0.0
     )
 }
