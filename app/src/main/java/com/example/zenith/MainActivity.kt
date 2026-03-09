@@ -16,8 +16,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.zenith.data.datasource.location.LocationProvider
 import com.example.zenith.data.datasource.remote.WeatherRemoteDataSource
 import com.example.zenith.data.network.RetrofitInstance
-import com.example.zenith.data.datasource.local.FavoriteLocalDataSource
+import com.example.zenith.data.datasource.local.database.FavoriteLocalDataSource
 import com.example.zenith.data.db.AppDatabase
+import com.example.zenith.data.local.datastore.SettingsDataStore
 import com.example.zenith.data.repo.WeatherRepository
 
 import com.example.zenith.presenters.home.ui.ErrorScreen
@@ -41,7 +42,8 @@ class MainActivity : ComponentActivity() {
         val locationProvider = LocationProvider(this)
         val database = AppDatabase.getDatabase(this)
         val localDataSource = FavoriteLocalDataSource(database.favoriteCityDao())
-        val repository = WeatherRepository(remoteDataSource, locationProvider, localDataSource)
+        val settingsDataStore = SettingsDataStore(this)
+        val repository = WeatherRepository(remoteDataSource, locationProvider, localDataSource, settingsDataStore)
         val factory = WeatherViewModelFactory(repository)
 
         setContent {

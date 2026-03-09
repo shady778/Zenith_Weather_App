@@ -23,10 +23,16 @@ import androidx.compose.ui.unit.sp
 import com.example.zenith.presenters.favorites.viewmodel.*
 import com.example.zenith.ui.components.GlassCard
 import com.example.zenith.ui.theme.ZenithColors
+import com.example.zenith.data.model.localizeNumbers
 
 @Composable
-fun CityCard(city: FavoriteCity, showCelsius: Boolean, onClick: () -> Unit, onDelete: () -> Unit) {
-    val temp = if (showCelsius) "${city.tempC.toInt()}°C" else "${(city.tempC * 9 / 5).toInt() + 32}°F"
+fun CityCard(city: FavoriteCity, onClick: () -> Unit, onDelete: () -> Unit) {
+    val unit = when (city.tempUnit) {
+        "FAHRENHEIT" -> "°F"
+        "KELVIN" -> "K"
+        else -> "°C"
+    }
+    val temp = "${city.tempC.toInt()}$unit".localizeNumbers(city.isArabic)
 
     val interactionSource = remember { MutableInteractionSource() }
 

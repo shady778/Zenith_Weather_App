@@ -2,9 +2,10 @@ package com.example.zenith.presenters.favorites.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.zenith.data.datasource.local.FavoriteCityEntity
+import com.example.zenith.data.datasource.local.database.FavoriteCityEntity
 import com.example.zenith.data.repo.WeatherRepository
 import com.example.zenith.data.model.WeatherData
+import com.example.zenith.data.model.localizeNumbers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,7 +29,9 @@ data class FavoriteCity(
     val localTime: String,
     val description: String,
     val condition: WeatherCondition,
-    val entity: FavoriteCityEntity
+    val entity: FavoriteCityEntity,
+    val isArabic: Boolean = false,
+    val tempUnit: String = "CELSIUS"
 )
 
 sealed class WeatherCondition(
@@ -85,49 +88,66 @@ class FavoriteViewModel(private val repository: WeatherRepository) : ViewModel()
 
     private fun loadFavorites() {
         viewModelScope.launch {
-            repository.allFavorites
-                .catch { e -> _uiState.value = FavoriteUiState.Error(e.message ?: "Error") }
-                .collect { entities ->
-                    if (entities.isEmpty()) {
-                        _uiState.value = FavoriteUiState.Empty
-                    } else {
-                        val cities = entities.map { entity ->
-                            async(kotlinx.coroutines.Dispatchers.IO) {
-                                try {
-                                    val response = repository.getCurrentWeather(entity.lat, entity.lon)
-                                    val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
-                                    calendar.add(Calendar.SECOND, response.timezone.toLong().toInt())
-                                    val sdf = SimpleDateFormat("hh:mm a", Locale.getDefault())
-                                    sdf.timeZone = TimeZone.getTimeZone("UTC")
-                                    val cityTime = sdf.format(calendar.time)
-
-                                    FavoriteCity(
-                                        id = entity.id,
-                                        name = response.name.ifEmpty { entity.name },
-                                        country = response.sys.country.ifEmpty { entity.country },
-                                        tempC = response.main.temp.toFloat(),
-                                        localTime = cityTime,
-                                        description = response.weather.getOrNull(0)?.description?.replaceFirstChar { it.uppercase() } ?: "Clear",
-                                        condition = WeatherCondition.fromIconCode(response.weather.getOrNull(0)?.icon ?: ""),
-                                        entity = entity
-                                    )
-                                } catch (e: Exception) {
-                                    FavoriteCity(
-                                        id = entity.id,
-                                        name = entity.name,
-                                        country = entity.country,
-                                        tempC = 0f,
-                                        localTime = "--:--",
-                                        description = "Error: ${e.localizedMessage?.take(12)}",
-                                        condition = WeatherCondition.Sunny,
-                                        entity = entity
-                                    )
+            kotlinx.coroutines.flow.combine(
+                repository.allFavorites,
+                repository.settingsDataStore.settingsFlow
+            ) { entities, settings ->
+                entities to settings
+            }.collect { (entities, settings) ->
+                if (entities.isEmpty()) {
+                    _uiState.value = FavoriteUiState.Empty
+                } else {
+                    _uiState.value = FavoriteUiState.Loading
+                    val isArabic = settings.language == "ARABIC"
+                    val langCode = if (isArabic) "ar" else "en"
+                    val tempUnit = settings.tempUnit
+                    val units = if (tempUnit == "FAHRENHEIT") "imperial" else "metric"
+                    
+                    val cities = entities.map { entity ->
+                        async(kotlinx.coroutines.Dispatchers.IO) {
+                            try {
+                                val response = repository.remoteDataSource.getCurrentWeather(entity.lat, entity.lon, units, langCode)
+                                val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+                                calendar.add(Calendar.SECOND, response.timezone.toLong().toInt())
+                                val locale = if (isArabic) Locale("ar") else Locale.ENGLISH
+                                val sdf = SimpleDateFormat("hh:mm a", locale)
+                                sdf.timeZone = TimeZone.getTimeZone("UTC")
+                                val cityTime = sdf.format(calendar.time).localizeNumbers(isArabic)
+                                val displayTemp = when (tempUnit) {
+                                    "KELVIN" -> (response.main.temp + 273.15).toFloat()
+                                    else -> response.main.temp.toFloat()
                                 }
+
+                                FavoriteCity(
+                                    id = entity.id,
+                                    name = response.name.ifEmpty { entity.name },
+                                    country = response.sys.country.ifEmpty { entity.country },
+                                    tempC = displayTemp,
+                                    localTime = cityTime,
+                                    description = response.weather.getOrNull(0)?.description?.replaceFirstChar { it.uppercase() } ?: "Clear",
+                                    condition = WeatherCondition.fromIconCode(response.weather.getOrNull(0)?.icon ?: ""),
+                                    entity = entity,
+                                    isArabic = isArabic,
+                                    tempUnit = tempUnit
+                                )
+                            } catch (e: Exception) {
+                                FavoriteCity(
+                                    id = entity.id,
+                                    name = entity.name,
+                                    country = entity.country,
+                                    tempC = 0f,
+                                    localTime = "--:--",
+                                    description = "Error: ${e.localizedMessage?.take(12)}",
+                                    condition = WeatherCondition.Sunny,
+                                    entity = entity,
+                                    isArabic = isArabic
+                                )
                             }
-                        }.awaitAll()
-                        _uiState.value = FavoriteUiState.Success(cities)
-                    }
+                        }
+                    }.awaitAll()
+                    _uiState.value = FavoriteUiState.Success(cities)
                 }
+            }
         }
     }
 

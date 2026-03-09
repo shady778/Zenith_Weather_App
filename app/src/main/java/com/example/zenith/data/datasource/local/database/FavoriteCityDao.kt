@@ -1,4 +1,4 @@
-package com.example.zenith.data.datasource.local
+package com.example.zenith.data.datasource.local.database
 
 import androidx.room.Dao
 import androidx.room.Delete

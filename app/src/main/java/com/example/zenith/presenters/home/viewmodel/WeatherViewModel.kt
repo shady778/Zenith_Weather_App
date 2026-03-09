@@ -56,24 +56,4 @@ class WeatherViewModel(val repository: WeatherRepository) : ViewModel() {
         }
     }
 
-    fun fetchWeatherForLocation(lat: Double, lon: Double) {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
-            repository.getWeatherDataForLocation(lat, lon)
-                .catch { exception ->
-                    val errorMsg = exception.localizedMessage ?: "Network error"
-                    _uiState.update { it.copy(isLoading = false, errorMessage = errorMsg) }
-                }
-                .collect { result ->
-                    result.fold(
-                        onSuccess = { data ->
-                            _uiState.update { it.copy(isLoading = false, weatherData = data) }
-                        },
-                        onFailure = { exception ->
-                            _uiState.update { it.copy(isLoading = false, errorMessage = exception.localizedMessage) }
-                        }
-                    )
-                }
-        }
-    }
 }

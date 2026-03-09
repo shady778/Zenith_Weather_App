@@ -85,10 +85,9 @@ fun ZenithTopBar(
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = title,
-                fontSize = 26.sp,
+                fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 color = ZenithColors.TextPrimary,
-                letterSpacing = (-0.5).sp
             )
             if (subtitle != null) {
                 Spacer(Modifier.height(2.dp))

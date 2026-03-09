@@ -48,7 +48,10 @@ fun HomeScreen(viewModel: WeatherViewModel) {
                             value = searchText,
                             onValueChange = { searchText = it },
                             placeholder = {
-                                Text("Search City...", color = Color.White.copy(alpha = 0.5f))
+                                Text(
+                                    if (data.isArabic) "البحث عن مدينة..." else "Search City...",
+                                    color = Color.White.copy(alpha = 0.5f)
+                                )
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -77,8 +80,8 @@ fun HomeScreen(viewModel: WeatherViewModel) {
 
                     item { WeatherHeader(data, data.isDay) }
                     item { MainWeatherCard(data, data.isDay) }
-                    item { HourlyForecastRow(data.hourlyForecast, data.isDay) }
-                    item { DailyForecastList(data.dailyForecast, data.isDay) }
+                    item { HourlyForecastRow(data.hourlyForecast, data.isDay, data.isArabic) }
+                    item { DailyForecastList(data.dailyForecast, data.isDay, data.isArabic) }
                 }
             }
         }

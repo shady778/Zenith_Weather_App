@@ -69,8 +69,8 @@ fun WeatherDetailsDialog(
 
                 item { WeatherHeader(data, data.isDay) }
                 item { MainWeatherCard(data, data.isDay) }
-                item { HourlyForecastRow(data.hourlyForecast, data.isDay) }
-                item { DailyForecastList(data.dailyForecast, data.isDay) }
+                item { HourlyForecastRow(data.hourlyForecast, data.isDay, data.isArabic) }
+                item { DailyForecastList(data.dailyForecast, data.isDay, data.isArabic) }
             }
         }
     }

@@ -1,4 +1,4 @@
-package com.example.zenith.data.datasource.local
+package com.example.zenith.data.datasource.local.database
 import kotlinx.coroutines.flow.Flow
 class FavoriteLocalDataSource(private val favoriteCityDao: FavoriteCityDao) {
 

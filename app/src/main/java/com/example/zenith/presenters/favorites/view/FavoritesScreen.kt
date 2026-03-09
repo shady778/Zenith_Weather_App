@@ -1,12 +1,10 @@
 package com.example.zenith.presenters.favorites.view
 
-import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.*
@@ -18,7 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.zenith.data.datasource.local.FavoriteCityEntity
+import com.example.zenith.data.datasource.local.database.FavoriteCityEntity
 import com.example.zenith.presenters.favorites.viewmodel.FavoriteUiState
 import com.example.zenith.presenters.favorites.viewmodel.FavoriteCity
 import com.example.zenith.ui.theme.ZenithColors
@@ -33,6 +31,7 @@ import com.example.zenith.presenters.favorites.viewmodel.FavoriteViewModel
 fun FavoritesScreen(
     viewModel: FavoriteViewModel,
     isDay: Boolean,
+    isArabic: Boolean = false,
     currentWeather: WeatherData? = null,
     onCitySelected: (Double, Double) -> Unit
 ) {
@@ -58,7 +57,7 @@ fun FavoritesScreen(
                 CenterAlignedTopAppBar(
                     title = {
                         Text(
-                            "Favorite Cities",
+                            if (isArabic) "المدن المفضلة" else "Favorite Cities",
                             fontWeight = FontWeight.Bold,
                             color = Color.White
                         )
@@ -76,7 +75,7 @@ fun FavoritesScreen(
                     shape = CircleShape,
                     modifier = Modifier.padding(bottom = 16.dp, end = 8.dp)
                 ) {
-                    Icon(Icons.Rounded.Add, contentDescription = "Add City", modifier = Modifier.size(32.dp))
+                    Icon(Icons.Rounded.Add, contentDescription = if (isArabic) "إضافة مدينة" else "Add City", modifier = Modifier.size(32.dp))
                 }
             }
         ) { padding ->
@@ -89,7 +88,7 @@ fun FavoritesScreen(
                         )
                     }
                     is FavoriteUiState.Empty -> {
-                        EmptyState(modifier = Modifier.align(Alignment.Center))
+                        EmptyState(isArabic = isArabic, modifier = Modifier.align(Alignment.Center))
                     }
                     is FavoriteUiState.Success -> {
                         LazyColumn(
@@ -100,7 +99,6 @@ fun FavoritesScreen(
                             items(state.cities) { city ->
                                 CityCard(
                                     city = city,
-                                    showCelsius = true,
                                     onClick = { 
                                         onCitySelected(city.entity.lat, city.entity.lon)
                                     },
@@ -125,6 +123,7 @@ fun FavoritesScreen(
             MapPicker(
                 initialLat = if (currentWeather?.lat != 0.0) currentWeather?.lat ?: 30.0444 else 30.0444,
                 initialLon = if (currentWeather?.lon != 0.0) currentWeather?.lon ?: 31.2357 else 31.2357,
+                isArabic = isArabic,
                 onDismiss = { showMapPicker = false },
                 onLocationSelected = { name, country, lat, lon ->
                     viewModel.addCity(
@@ -142,6 +141,7 @@ fun FavoritesScreen(
         cityToDelete?.let { city ->
             ZenithDeleteDialog(
                 cityName = city.name,
+                isArabic = isArabic,
                 onDismiss = { cityToDelete = null },
                 onConfirm = { 
                     viewModel.removeCity(city.entity)
@@ -166,7 +166,7 @@ fun FavoritesScreen(
 
 
 @Composable
-fun EmptyState(modifier: Modifier = Modifier) {
+fun EmptyState(isArabic: Boolean, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier.padding(40.dp),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -187,14 +187,14 @@ fun EmptyState(modifier: Modifier = Modifier) {
         }
         Spacer(Modifier.height(24.dp))
         Text(
-            "No Favorites Yet",
+            if (isArabic) "لا توجد مدن مفضلة" else "No Favorites Yet",
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
             color = Color.White
         )
         Spacer(Modifier.height(8.dp))
         Text(
-            "Tap the + button to add your favorite cities and track their weather.",
+            if (isArabic) "اضغط على زر + لإضافة مدنك المفضلة وتتبع حالة الطقس فيها." else "Tap the + button to add your favorite cities and track their weather.",
             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
             color = ZenithColors.TextSecondary,
             lineHeight = 22.sp

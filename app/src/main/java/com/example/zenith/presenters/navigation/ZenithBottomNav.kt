@@ -27,6 +27,7 @@ import com.example.zenith.ui.theme.ZenithColors
 fun ZenithBottomNav(
     currentRoute: String?,
     isDay: Boolean,
+    isArabic: Boolean = false,
     onSelect: (Screen) -> Unit,
 ) {
     val items = remember {
@@ -75,6 +76,7 @@ fun ZenithBottomNav(
                         screen = screen,
                         selected = isSelected,
                         isDay = isDay,
+                        isArabic = isArabic,
                         onClick = { onSelect(screen) },
                         modifier = Modifier.weight(1f)
                     )
@@ -89,6 +91,7 @@ fun NavItem(
     screen: Screen,
     selected: Boolean,
     isDay: Boolean,
+    isArabic: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -153,7 +156,12 @@ fun NavItem(
                 )
         }
         Text(
-            text = screen.label,
+            text = when(screen) {
+                Screen.Home -> if (isArabic) "الرئيسية" else "Home"
+                Screen.Favorites -> if (isArabic) "المفضلة" else "Favorites"
+                Screen.Alerts -> if (isArabic) "التنبيهات" else "Alerts"
+                Screen.Settings -> if (isArabic) "الإعدادات" else "Settings"
+            },
             fontSize = 11.sp,
             fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
             color = if (selected) {

@@ -7,8 +7,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowBack
-import androidx.compose.material.icons.rounded.LocationOn
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.example.zenith.ui.theme.ZenithColors
 import org.osmdroid.config.Configuration
@@ -28,6 +29,7 @@ import java.util.Locale
 fun MapPicker(
     initialLat: Double = 0.0,
     initialLon: Double = 0.0,
+    isArabic: Boolean = false,
     onDismiss: () -> Unit,
     onLocationSelected: (String, String, Double, Double) -> Unit
 ) {
@@ -38,6 +40,7 @@ fun MapPicker(
         Configuration.getInstance().load(context, context.getSharedPreferences("osmdroid", 0))
         mapView.setTileSource(TileSourceFactory.MAPNIK)
         mapView.setMultiTouchControls(true)
+        mapView.setBuiltInZoomControls(false)
         mapView.controller.setZoom(12.0)
 
         val startPoint = if (initialLat != 0.0 && initialLon != 0.0) {
@@ -66,8 +69,35 @@ fun MapPicker(
                         .padding(20.dp)
                         .background(ZenithColors.SurfaceGlass, CircleShape)
                         .border(1.dp, ZenithColors.BorderGlass, CircleShape)
+                        .align(Alignment.TopStart)
                 ) {
-                    Icon(Icons.Rounded.ArrowBack, null, tint = Color.White)
+                    Icon(Icons.AutoMirrored.Rounded.ArrowBack, null, tint = Color.White)
+                }
+
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .padding(end = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    IconButton(
+                        onClick = { mapView.controller.zoomIn() },
+                        modifier = Modifier
+                            .size(48.dp)
+                            .background(Color.White, RoundedCornerShape(14.dp))
+                            .border(2.dp, Color.White.copy(0.1f), RoundedCornerShape(14.dp))
+                    ) {
+                        Icon(Icons.Rounded.Add, null, tint = Color.Black, modifier = Modifier.size(24.dp))
+                    }
+                    IconButton(
+                        onClick = { mapView.controller.zoomOut() },
+                        modifier = Modifier
+                            .size(48.dp)
+                            .background(Color.White, RoundedCornerShape(14.dp))
+                            .border(2.dp, Color.White.copy(0.1f), RoundedCornerShape(14.dp))
+                    ) {
+                        Icon(Icons.Rounded.Remove, null, tint = Color.Black, modifier = Modifier.size(24.dp))
+                    }
                 }
 
                 Icon(
@@ -80,7 +110,7 @@ fun MapPicker(
                 Button(
                     onClick = {
                         val center = mapView.mapCenter
-                        val geocoder = Geocoder(context, Locale.getDefault())
+                        val geocoder = Geocoder(context, if (isArabic) Locale("ar") else Locale.getDefault())
                         try {
                             val addresses = geocoder.getFromLocation(center.latitude, center.longitude, 1)
                             val name = addresses?.firstOrNull()?.locality ?: "Unknown Location"
@@ -95,11 +125,16 @@ fun MapPicker(
                         .align(Alignment.BottomCenter)
                         .padding(bottom = 40.dp)
                         .height(56.dp)
-                        .padding(horizontal = 40.dp),
+                        .fillMaxWidth(0.8f),
                     colors = ButtonDefaults.buttonColors(containerColor = ZenithColors.Cyan),
                     shape = RoundedCornerShape(20.dp)
                 ) {
-                    Text("Confirm Location", color = ZenithColors.Background, fontWeight = FontWeight.Bold)
+                    Text(
+                        if (isArabic) "تأكيد الموقع" else "Confirm Location",
+                        color = ZenithColors.Background,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp
+                    )
                 }
             }
         }

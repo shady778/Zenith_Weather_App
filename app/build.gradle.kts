@@ -82,6 +82,7 @@ dependencies {
     implementation("com.airbnb.android:lottie-compose:6.4.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.4")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.4")
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
     implementation("org.osmdroid:osmdroid-android:6.1.18")
     val room_version = "2.6.1"
 

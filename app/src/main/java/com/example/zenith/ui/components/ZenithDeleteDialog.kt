@@ -19,6 +19,7 @@ import com.example.zenith.ui.theme.ZenithColors
 @Composable
 fun ZenithDeleteDialog(
     cityName: String,
+    isArabic: Boolean = false,
     onDismiss: () -> Unit,
     onConfirm: () -> Unit
 ) {
@@ -51,14 +52,15 @@ fun ZenithDeleteDialog(
                 }
 
                 Text(
-                    text = "Delete City?",
+                    text = if (isArabic) "حذف المدينة؟" else "Delete City?",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = ZenithColors.TextPrimary
                 )
 
                 Text(
-                    text = "Are you sure you want to remove \"$cityName\" from your favorites?",
+                    text = if (isArabic) "هل أنت متأكد أنك تريد حذف \"$cityName\" من المفضلة؟" 
+                           else "Are you sure you want to remove \"$cityName\" from your favorites?",
                     fontSize = 14.sp,
                     color = ZenithColors.TextSecondary,
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center,
@@ -81,7 +83,7 @@ fun ZenithDeleteDialog(
                         shape = RoundedCornerShape(12.dp),
                         contentPadding = PaddingValues(vertical = 12.dp)
                     ) {
-                        Text("Cancel", color = ZenithColors.TextPrimary)
+                        Text(if (isArabic) "إلغاء" else "Cancel", color = ZenithColors.TextPrimary)
                     }
 
                     // Confirm Button
@@ -97,7 +99,7 @@ fun ZenithDeleteDialog(
                         shape = RoundedCornerShape(12.dp),
                         contentPadding = PaddingValues(vertical = 12.dp)
                     ) {
-                        Text("Yes, Delete", color = Color.White, fontWeight = FontWeight.Bold)
+                        Text(if (isArabic) "نعم، حذف" else "Yes, Delete", color = Color.White, fontWeight = FontWeight.Bold)
                     }
                 }
             }

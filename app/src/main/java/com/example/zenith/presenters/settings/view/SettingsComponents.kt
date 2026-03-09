@@ -106,8 +106,19 @@ fun SettingsRow(
                 Icon(imageVector = icon, contentDescription = null, tint = iconTint, modifier = Modifier.size(20.dp))
             }
             Column(modifier = Modifier.weight(1f)) {
-                Text(text = title, fontSize = 15.sp, fontWeight = FontWeight.Medium, color = Color.White)
-                Text(text = subtitle, fontSize = 12.sp, color = ZenithColors.TextSecondary)
+                Text(
+                    text = title,
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Color.White,
+                    lineHeight = 18.sp
+                )
+                Text(
+                    text = subtitle,
+                    fontSize = 11.sp, // Reduced from 12sp for more space
+                    color = ZenithColors.TextSecondary,
+                    lineHeight = 14.sp
+                )
             }
             trailing()
         }
