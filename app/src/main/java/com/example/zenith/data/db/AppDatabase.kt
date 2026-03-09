@@ -4,8 +4,8 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import android.content.Context
 import androidx.room.Room
-import com.example.zenith.data.datasource.local.FavoriteCityDao
-import com.example.zenith.data.datasource.local.FavoriteCityEntity
+import com.example.zenith.data.datasource.local.database.FavoriteCityDao
+import com.example.zenith.data.datasource.local.database.FavoriteCityEntity
 
 @Database(entities = [FavoriteCityEntity::class], version = 1, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {

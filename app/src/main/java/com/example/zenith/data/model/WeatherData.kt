@@ -15,7 +15,8 @@ data class WeatherData(
     val dailyForecast: List<DailyForecast>,
     val isDay: Boolean,
     val lat: Double = 0.0,
-    val lon: Double = 0.0
+    val lon: Double = 0.0,
+    val isArabic: Boolean = false
 )
 
 data class HourlyForecast(

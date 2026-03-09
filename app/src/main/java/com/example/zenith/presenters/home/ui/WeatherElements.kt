@@ -159,10 +159,10 @@ fun MainWeatherCard(data: WeatherData, isDay: Boolean) {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceAround
             ) {
-                QuickStat(Icons.Rounded.Air, "${data.windSpeed} m/s", "Wind", isDay)
-                QuickStat(Icons.Rounded.Cloud, "${data.clouds}%", "Clouds", isDay)
-                QuickStat(Icons.Rounded.Opacity, "${data.humidity}%", "Humidity", isDay)
-                QuickStat(Icons.Rounded.Compress, "${data.pressure} hPa", "Pressure", isDay)
+                QuickStat(Icons.Rounded.Air, data.windSpeed, if (data.isArabic) "الرياح" else "Wind", isDay)
+                QuickStat(Icons.Rounded.Cloud, "${data.clouds}%", if (data.isArabic) "السحب" else "Clouds", isDay)
+                QuickStat(Icons.Rounded.Opacity, "${data.humidity}", if (data.isArabic) "الرطوبة" else "Humidity", isDay)
+                QuickStat(Icons.Rounded.Compress, "${data.pressure} hPa", if (data.isArabic) "الضغط" else "Pressure", isDay)
             }
         }
     }
@@ -179,9 +179,9 @@ fun QuickStat(icon: ImageVector, value: String, label: String, isDay: Boolean) {
 }
 
 @Composable
-fun HourlyForecastRow(data: List<HourlyForecast>, isDay: Boolean) {
+fun HourlyForecastRow(data: List<HourlyForecast>, isDay: Boolean, isArabic: Boolean = false) {
     Column {
-        SectionTitle("Hourly Forecast", isDay)
+        SectionTitle(if (isArabic) "التوقعات بالساعة" else "Hourly Forecast", isDay)
         Spacer(Modifier.height(12.dp))
         LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             items(data.size) { index ->
@@ -214,9 +214,9 @@ fun HourlyForecastRow(data: List<HourlyForecast>, isDay: Boolean) {
 }
 
 @Composable
-fun DailyForecastList(data: List<DailyForecast>, isDay: Boolean) {
+fun DailyForecastList(data: List<DailyForecast>, isDay: Boolean, isArabic: Boolean = false) {
     Column {
-        SectionTitle("Next Days", isDay)
+        SectionTitle(if (isArabic) "الأيام القادمة" else "Next Days", isDay)
         Spacer(Modifier.height(12.dp))
         Column(
             modifier = Modifier
