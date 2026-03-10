@@ -14,6 +14,8 @@ import com.example.zenith.presenters.favorites.viewmodel.FavoriteViewModel
 import com.example.zenith.presenters.home.viewmodel.WeatherUiState
 import com.example.zenith.presenters.settings.view.SettingsScreen
 import com.example.zenith.presenters.settings.viewmodel.SettingsViewModel
+import com.example.zenith.presenters.alerts.view.AlertsScreen
+import com.example.zenith.presenters.alerts.viewmodel.AlertViewModel
 import kotlinx.coroutines.flow.StateFlow
 
 @Composable
@@ -22,6 +24,7 @@ fun ZenithNavGraph(
     weatherViewModel: WeatherViewModel,
     favoriteViewModel: FavoriteViewModel,
     settingsViewModel: SettingsViewModel,
+    alertViewModel: AlertViewModel,
     isDay: Boolean,
     modifier: Modifier = Modifier
 
@@ -50,6 +53,12 @@ fun ZenithNavGraph(
         }
 
         composable(Screen.Alerts.route) {
+            val settings = settingsViewModel.settingsState.collectAsState().value
+            AlertsScreen(
+                isDay = isDay, 
+                isArabic = settings.language == "ARABIC",
+                viewModel = alertViewModel
+            )
         }
         composable(Screen.Settings.route) {
             SettingsScreen(

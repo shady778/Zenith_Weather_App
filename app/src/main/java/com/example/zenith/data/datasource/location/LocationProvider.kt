@@ -15,8 +15,14 @@ class LocationProvider (context: Context) {
     fun fetchLocation(): Flow<Pair<Double, Double>> = callbackFlow {
         fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
             .addOnSuccessListener { location ->
-                location?.let {
-                    trySend(Pair(it.latitude, it.longitude))
+                if (location != null) {
+                    trySend(Pair(location.latitude, location.longitude))
+                } else {
+                    // Fallback to last known location if current is null
+                    fusedLocationClient.lastLocation.addOnSuccessListener { lastLoc ->
+                        if (lastLoc != null) trySend(Pair(lastLoc.latitude, lastLoc.longitude))
+                        else close()
+                    }.addOnFailureListener { close(it) }
                 }
             }
             .addOnFailureListener { exception ->

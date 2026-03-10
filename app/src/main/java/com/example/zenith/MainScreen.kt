@@ -17,6 +17,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.zenith.data.local.datastore.SettingsDataStore
 import com.example.zenith.presenters.settings.viewmodel.SettingsViewModel
 import com.example.zenith.presenters.settings.viewmodel.SettingsViewModelFactory
+import com.example.zenith.presenters.alerts.viewmodel.AlertViewModel
+import com.example.zenith.presenters.alerts.viewmodel.AlertViewModelFactory
+import com.example.zenith.data.repo.AlertRepository
+import com.example.zenith.data.datasource.local.database.AlertLocalDataSource
+import com.example.zenith.data.db.AppDatabase
+import com.example.zenith.presenters.alerts.logic.AlertScheduler
 
 
 @Composable
@@ -32,6 +38,14 @@ fun MainScreen(weatherViewModel: WeatherViewModel) {
     val settingsViewModel: SettingsViewModel = viewModel(
         factory = SettingsViewModelFactory(
             SettingsDataStore(LocalContext.current)
+        )
+    )
+
+    val context = LocalContext.current
+    val alertViewModel: AlertViewModel = viewModel(
+        factory = AlertViewModelFactory(
+            AlertRepository(AlertLocalDataSource(AppDatabase.getDatabase(context).alertDao())),
+            AlertScheduler(context)
         )
     )
 
@@ -70,6 +84,7 @@ fun MainScreen(weatherViewModel: WeatherViewModel) {
                 weatherViewModel = weatherViewModel,
                 favoriteViewModel = favoriteViewModel,
                 settingsViewModel = settingsViewModel,
+                alertViewModel = alertViewModel,
                 isDay = isDay,
                 modifier = Modifier.padding(innerPadding)
             )

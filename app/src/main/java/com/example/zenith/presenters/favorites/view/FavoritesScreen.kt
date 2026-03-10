@@ -140,7 +140,7 @@ fun FavoritesScreen(
 
         cityToDelete?.let { city ->
             ZenithDeleteDialog(
-                cityName = city.name,
+                itemName = city.name,
                 isArabic = isArabic,
                 onDismiss = { cityToDelete = null },
                 onConfirm = { 

@@ -87,10 +87,19 @@ class MainActivity : ComponentActivity() {
             LaunchedEffect(Unit) {
                 if (splashState is SplashState.Idle) {
                     splashViewModel.updateState(SplashState.RequestingPermissions)
-                    permissionLauncher.launch(arrayOf(
-                        Manifest.permission.ACCESS_FINE_LOCATION,
-                        Manifest.permission.ACCESS_COARSE_LOCATION
-                    ))
+                    val permissions = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                        arrayOf(
+                            Manifest.permission.ACCESS_FINE_LOCATION,
+                            Manifest.permission.ACCESS_COARSE_LOCATION,
+                            Manifest.permission.POST_NOTIFICATIONS
+                        )
+                    } else {
+                        arrayOf(
+                            Manifest.permission.ACCESS_FINE_LOCATION,
+                            Manifest.permission.ACCESS_COARSE_LOCATION
+                        )
+                    }
+                    permissionLauncher.launch(permissions)
                 }
             }
 
