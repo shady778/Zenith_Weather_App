@@ -1,0 +1,32 @@
+<resources>
+    <string name="app_name">Zenith</string>
+    <string name="wind_unit_kmh">كم/س</string>
+    <string name="rain_detected">رصد أمطار</string>
+    <string name="cloudiness_format">نسبة الغيوم %1$d%%</string>
+    <string name="notification_title_format">[%1$s] تنبيه: %2$s</string>
+    <string name="weather_label_format">الجو حالياً %1$s ودرجة الحرارة %2$s</string>
+    <string name="temperature_format">%1$s°</string>
+    <string name="wind_speed_format">%1$s %2$s</string>
+    
+    <string name="weather_clear_sky">سماء صافية</string>
+    <string name="weather_few_clouds">سحب قليلة</string>
+    <string name="weather_scattered_clouds">سحب متفرقة</string>
+    <string name="weather_broken_clouds">سحب متقطعة</string>
+    <string name="weather_overcast_clouds">غيوم كثيفة</string>
+    <string name="weather_shower_rain">زخات مطر</string>
+    <string name="weather_rain">مطر</string>
+    <string name="weather_thunderstorm">عاصفة رعدية</string>
+    <string name="weather_snow">ثلوج</string>
+    <string name="weather_mist">ضباب خفيف</string>
+    <string name="weather_smoke">دخان</string>
+    <string name="weather_haze">غبار خفيف</string>
+    <string name="weather_dust">غبار</string>
+    <string name="weather_fog">ضباب</string>
+    <string name="weather_sand">رمال</string>
+    <string name="weather_ash">رماد بركاني</string>
+    <string name="weather_squall">عواصف مفاجئة</string>
+    <string name="weather_tornado">إعصار</string>
+    <string name="weather_light_rain">مطر خفيف</string>
+    <string name="weather_moderate_rain">مطر متوسط</string>
+    <string name="weather_heavy_intensity_rain">مطر غزير</string>
+</resources>
