@@ -1,3 +1,33 @@
 <resources>
     <string name="app_name">Zenith</string>
+    <string name="wind_unit_kmh">km/h</string>
+    <string name="rain_detected">Rain detected</string>
+    <string name="cloudiness_format">Cloudiness %1$d%%</string>
+    <string name="notification_title_format">[%1$s] Alert: %2$s</string>
+    <string name="weather_label_format">Currently %1$s with %2$s</string>
+    <string name="temperature_format">%1$s°</string>
+    <string name="wind_speed_format">%1$s %2$s</string>
+    
+    <!-- Weather Descriptions -->
+    <string name="weather_clear_sky">Clear Sky</string>
+    <string name="weather_few_clouds">Few Clouds</string>
+    <string name="weather_scattered_clouds">Scattered Clouds</string>
+    <string name="weather_broken_clouds">Broken Clouds</string>
+    <string name="weather_overcast_clouds">Overcast Clouds</string>
+    <string name="weather_shower_rain">Shower Rain</string>
+    <string name="weather_rain">Rain</string>
+    <string name="weather_thunderstorm">Thunderstorm</string>
+    <string name="weather_snow">Snow</string>
+    <string name="weather_mist">Mist</string>
+    <string name="weather_smoke">Smoke</string>
+    <string name="weather_haze">Haze</string>
+    <string name="weather_dust">Dust</string>
+    <string name="weather_fog">Fog</string>
+    <string name="weather_sand">Sand</string>
+    <string name="weather_ash">Ash</string>
+    <string name="weather_squall">Squall</string>
+    <string name="weather_tornado">Tornado</string>
+    <string name="weather_light_rain">Light Rain</string>
+    <string name="weather_moderate_rain">Moderate Rain</string>
+    <string name="weather_heavy_intensity_rain">Heavy Intensity Rain</string>
 </resources>
