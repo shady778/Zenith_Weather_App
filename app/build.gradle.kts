@@ -56,10 +56,11 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(libs.play.services.location)
+    implementation(libs.androidx.work.runtime.ktx)
     implementation("androidx.core:core-splashscreen:1.0.1")
 
     // 2. Compose BOM (Bill of Materials) - EL MONYAFEESTO
-    val composeBom = platform("androidx.compose:compose-bom:2024.02.01")
+    val composeBom = platform(libs.androidx.compose.bom)
     implementation(composeBom)
     androidTestImplementation(composeBom)
 
@@ -84,6 +85,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.4")
     implementation("androidx.datastore:datastore-preferences:1.1.1")
     implementation("org.osmdroid:osmdroid-android:6.1.18")
+    implementation("com.airbnb.android:lottie-compose:6.0.0")
     val room_version = "2.6.1"
 
     implementation("androidx.room:room-runtime:$room_version")
