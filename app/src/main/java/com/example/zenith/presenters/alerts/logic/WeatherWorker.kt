@@ -41,6 +41,7 @@ class WeatherWorker(context: Context, params: WorkerParameters) : CoroutineWorke
             remoteDataSource,
             locationProvider,
             favoriteLocalDataSource,
+            database.weatherDao(),
             settingsDataStore
         )
 

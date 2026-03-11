@@ -28,6 +28,7 @@ import com.example.zenith.presenters.home.viewmodel.WeatherViewModelFactory
 import com.example.zenith.presenters.splash.view.SplashScreen
 import com.example.zenith.presenters.splash.viewmodel.SplashState
 import com.example.zenith.presenters.splash.viewmodel.SplashViewModel
+import com.example.zenith.data.network.NetworkMonitor
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
 
@@ -43,8 +44,15 @@ class MainActivity : ComponentActivity() {
         val database = AppDatabase.getDatabase(this)
         val localDataSource = FavoriteLocalDataSource(database.favoriteCityDao())
         val settingsDataStore = SettingsDataStore(this)
-        val repository = WeatherRepository(remoteDataSource, locationProvider, localDataSource, settingsDataStore)
-        val factory = WeatherViewModelFactory(repository)
+        val networkMonitor = NetworkMonitor(this)
+        val repository = WeatherRepository(
+            remoteDataSource,
+            locationProvider,
+            localDataSource,
+            database.weatherDao(),
+            settingsDataStore
+        )
+        val factory = WeatherViewModelFactory(repository, networkMonitor)
 
         setContent {
             val splashViewModel: SplashViewModel = viewModel()
