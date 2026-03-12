@@ -41,7 +41,7 @@
             android:showOnLockScreen="true"
             android:showWhenLocked="true"
             android:turnScreenOn="true"
-            android:theme="@style/Theme.App.Starting" />
+            android:theme="@style/Theme.Zenith.Transparent" />
 
         <receiver
             android:name=".presenters.alerts.logic.AlertReceiver"

@@ -22,6 +22,7 @@ fun String.localizeNumbers(isArabic: Boolean): String {
 fun convertTempFromMetric(celsiusValue: Double, unit: String): Int {
     return when (unit) {
         "KELVIN" -> (celsiusValue + 273.15).toInt()
+        "FAHRENHEIT" -> (celsiusValue * 9 / 5 + 32).toInt()
         else -> celsiusValue.toInt()
     }
 }
@@ -36,11 +37,11 @@ fun mapResponseToData(
     val sdf = SimpleDateFormat("EEEE, dd MMM", locale)
 
     val tempUnit = settings.tempUnit
-    val isImperial = tempUnit == "FAHRENHEIT"
+    val isImperialApi = tempUnit == "FAHRENHEIT"
 
     val hourly = forecast.list.take(8).map {
         val hourSdf = SimpleDateFormat("HH:mm", locale)
-        val temp = if (isImperial) it.main.temp.toInt() else convertTempFromMetric(it.main.temp, tempUnit)
+        val temp = if (isImperialApi) it.main.temp.toInt() else convertTempFromMetric(it.main.temp, tempUnit)
         HourlyForecast(
             time = hourSdf.format(Date(it.dt * 1000L)).localizeNumbers(isArabic),
             temp = "${temp}°".localizeNumbers(isArabic),
@@ -50,8 +51,8 @@ fun mapResponseToData(
 
     val daily = forecast.list.filter { it.dt_txt.contains("12:00:00") }.map {
         val daySdf = SimpleDateFormat("EEEE", locale)
-        val high = if (isImperial) it.main.temp_max.toInt() else convertTempFromMetric(it.main.temp_max, tempUnit)
-        val low = if (isImperial) it.main.temp_min.toInt() else convertTempFromMetric(it.main.temp_min, tempUnit)
+        val high = if (isImperialApi) it.main.temp_max.toInt() else convertTempFromMetric(it.main.temp_max, tempUnit)
+        val low = if (isImperialApi) it.main.temp_min.toInt() else convertTempFromMetric(it.main.temp_min, tempUnit)
         DailyForecast(
             day = daySdf.format(Date(it.dt * 1000L)),
             highTemp = "${high}°".localizeNumbers(isArabic),
@@ -66,9 +67,17 @@ fun mapResponseToData(
         "KELVIN" -> "K"
         else -> "°C"
     }
+
+    val apiWindSpeed = current.wind.speed
+    val convertedWindSpeed = when {
+        isImperialApi && settings.windUnit == "MS" -> apiWindSpeed / 2.23694
+        !isImperialApi && settings.windUnit == "MPH" -> apiWindSpeed * 2.23694
+        else -> apiWindSpeed
+    }
+
     val windUnitText = if (settings.windUnit == "MPH") (if (isArabic) "ميل/س" else "mph") else (if (isArabic) "م/ث" else "m/s")
 
-    val currentTemp = if (isImperial) current.main.temp.toInt() else convertTempFromMetric(current.main.temp, tempUnit)
+    val currentTemp = if (isImperialApi) current.main.temp.toInt() else convertTempFromMetric(current.main.temp, tempUnit)
 
     return WeatherData(
         localTime = sdf.format(Date()).localizeNumbers(isArabic),
@@ -80,7 +89,7 @@ fun mapResponseToData(
         pressure = "${current.main.pressure}".localizeNumbers(isArabic),
         icon = current.weather[0].icon,
         humidity = "${current.main.humidity}%".localizeNumbers(isArabic),
-        windSpeed = "${current.wind.speed.toInt()} $windUnitText".localizeNumbers(isArabic),
+        windSpeed = "${String.format(Locale.ENGLISH, "%.1f", convertedWindSpeed)} $windUnitText".localizeNumbers(isArabic),
         hourlyForecast = hourly,
         dailyForecast = daily,
         isDay = current.weather[0].icon.contains("d"),

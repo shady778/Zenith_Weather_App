@@ -7,14 +7,12 @@ import android.content.res.Configuration
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.example.zenith.R
-import com.example.zenith.data.datasource.local.database.AlertLocalDataSource
-import com.example.zenith.data.datasource.local.database.FavoriteLocalDataSource
-import com.example.zenith.data.datasource.location.LocationProvider
+import com.example.zenith.data.datasource.local.database.LocalDataSource
+import com.example.zenith.data.location.LocationProvider
 import com.example.zenith.data.datasource.remote.WeatherRemoteDataSource
 import com.example.zenith.data.db.AppDatabase
 import com.example.zenith.data.local.datastore.SettingsDataStore
 import com.example.zenith.data.network.RetrofitInstance
-import com.example.zenith.data.repo.AlertRepository
 import com.example.zenith.data.repo.WeatherRepository
 import com.example.zenith.presenters.alerts.view.AlertType
 import com.example.zenith.presenters.alerts.view.WeatherTrigger
@@ -29,24 +27,25 @@ class WeatherWorker(context: Context, params: WorkerParameters) : CoroutineWorke
 
         val database = AppDatabase.getDatabase(applicationContext)
         val alertDao = database.alertDao()
-        val alertLocalDataSource = AlertLocalDataSource(alertDao)
-        val alertRepository = AlertRepository(alertLocalDataSource)
-
+        val favoriteDao = database.favoriteCityDao()
+        val alertLocalDataSource = LocalDataSource(favoriteDao,alertDao)
         val apiService = RetrofitInstance.apiService
         val remoteDataSource = WeatherRemoteDataSource(apiService)
         val locationProvider = LocationProvider(applicationContext)
-        val favoriteLocalDataSource = FavoriteLocalDataSource(database.favoriteCityDao())
+        val favoriteLocalDataSource = LocalDataSource(favoriteDao,alertDao)
         val settingsDataStore = SettingsDataStore(applicationContext)
         val weatherRepository = WeatherRepository(
             remoteDataSource,
             locationProvider,
             favoriteLocalDataSource,
-            settingsDataStore
+            database.weatherDao(),
+            settingsDataStore,
+            alertLocalDataSource
         )
 
         val notificationHelper = NotificationHelper(applicationContext)
 
-        val alert = alertRepository.getAlertById(alertId) ?: return Result.failure()
+        val alert = weatherRepository.getAlertById(alertId) ?: return Result.failure()
         if (!alert.isEnabled) return Result.success()
 
         try {
@@ -94,7 +93,7 @@ class WeatherWorker(context: Context, params: WorkerParameters) : CoroutineWorke
                 
                 val rawDesc = weather.weather.firstOrNull()?.description ?: ""
                 val weatherDesc = translateWeather(localizedContext, rawDesc)
-                val triggerName = alert.trigger.getLabel(isArabic)
+                val triggerName = alert.trigger.getLabel(applicationContext, isArabic)
                 
                 val triggerReading = when(alert.trigger) {
                     WeatherTrigger.TEMPERATURE -> localizedContext.getString(R.string.temperature_format, weather.main.temp.toString())
@@ -107,7 +106,7 @@ class WeatherWorker(context: Context, params: WorkerParameters) : CoroutineWorke
                     else -> weatherDesc
                 }
 
-                val modeLabel = alert.type.getLabel(isArabic)
+                val modeLabel = alert.type.getLabel(applicationContext, isArabic)
                 val title = localizedContext.getString(R.string.notification_title_format, modeLabel, alert.label)
                 val weatherLabel = localizedContext.getString(R.string.weather_label_format, weatherDesc, "${weather.main.temp}°")
 

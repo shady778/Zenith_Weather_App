@@ -9,13 +9,16 @@ import com.example.zenith.data.datasource.local.database.AlertDao
 import com.example.zenith.data.datasource.local.database.AlertEntity
 import com.example.zenith.data.datasource.local.database.FavoriteCityDao
 import com.example.zenith.data.datasource.local.database.FavoriteCityEntity
+import com.example.zenith.data.datasource.local.database.WeatherDao
+import com.example.zenith.data.datasource.local.database.WeatherEntity
 
-@Database(entities = [FavoriteCityEntity::class, AlertEntity::class], version = 2, exportSchema = false)
+@Database(entities = [FavoriteCityEntity::class, AlertEntity::class, WeatherEntity::class], version = 3, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun favoriteCityDao(): FavoriteCityDao
     abstract fun alertDao(): AlertDao
+    abstract fun weatherDao(): WeatherDao
 
     companion object {
         @Volatile

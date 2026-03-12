@@ -7,13 +7,20 @@ import com.example.zenith.data.repo.WeatherRepository
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
+import com.example.zenith.data.network.NetworkMonitor
+
 data class WeatherUiState(
     val isLoading: Boolean = false,
     val weatherData: WeatherData? = null,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val isOnline: Boolean = true,
+    val showNoInternetAlert: Boolean = false
 )
 
-class WeatherViewModel(val repository: WeatherRepository) : ViewModel() {
+class WeatherViewModel(
+    val repository: WeatherRepository,
+    private val networkMonitor: NetworkMonitor
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(WeatherUiState())
     val uiState: StateFlow<WeatherUiState> = _uiState.asStateFlow()
@@ -22,7 +29,24 @@ class WeatherViewModel(val repository: WeatherRepository) : ViewModel() {
     val errorEvents = _errorEvents.asSharedFlow()
 
     init {
+        monitorConnectivity()
         fetchWeather()
+    }
+
+    private fun monitorConnectivity() {
+        viewModelScope.launch {
+            networkMonitor.isConnected.collect { online ->
+                _uiState.update { it.copy(isOnline = online) }
+            }
+        }
+    }
+
+    fun triggerNoInternetAlert() {
+        _uiState.update { it.copy(showNoInternetAlert = true) }
+    }
+
+    fun dismissNoInternetAlert() {
+        _uiState.update { it.copy(showNoInternetAlert = false) }
     }
 
     fun fetchWeather() {
@@ -55,5 +79,4 @@ class WeatherViewModel(val repository: WeatherRepository) : ViewModel() {
                 }
         }
     }
-
 }

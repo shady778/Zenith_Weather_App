@@ -1,8 +1,11 @@
 package com.example.zenith.data.repo
 
+import com.example.zenith.data.datasource.local.database.AlertEntity
 import com.example.zenith.data.datasource.local.database.FavoriteCityEntity
-import com.example.zenith.data.datasource.local.database.FavoriteLocalDataSource
-import com.example.zenith.data.datasource.location.LocationProvider
+import com.example.zenith.data.datasource.local.database.LocalDataSource
+import com.example.zenith.data.datasource.local.database.WeatherDao
+import com.example.zenith.data.datasource.local.database.WeatherEntity
+import com.example.zenith.data.location.LocationProvider
 import com.example.zenith.data.datasource.remote.ForecastResponse
 import com.example.zenith.data.datasource.remote.WeatherRemoteDataSource
 import com.example.zenith.data.datasource.remote.WeatherResponse
@@ -12,6 +15,7 @@ import com.example.zenith.data.model.WeatherData
 import com.example.zenith.data.model.mapResponseToData
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -19,8 +23,10 @@ import kotlinx.coroutines.flow.flowOf
 class WeatherRepository(
     val remoteDataSource: WeatherRemoteDataSource,
     private val locationProvider: LocationProvider,
-    private val localDataSource: FavoriteLocalDataSource,
-    val settingsDataStore: SettingsDataStore
+    private val localDataSource: LocalDataSource,
+    private val weatherDao: WeatherDao,
+    val settingsDataStore: SettingsDataStore,
+    val alertLocalDataSource: LocalDataSource
 ) {
 
     suspend fun fetchCurrent(lat: Double, lon: Double, units: String, lang: String): WeatherResponse {
@@ -67,14 +73,23 @@ class WeatherRepository(
         config: WeatherConfig,
         settings: UserSettings
     ): Flow<Result<WeatherData>> = flow {
+        val cached = weatherDao.getWeatherCache().firstOrNull()?.data
+        if (cached != null) {
+            emit(Result.success(cached))
+        }
+
         try {
             val current = fetchCurrent(lat, lon, config.units, config.lang)
             val forecast = fetchForecast(lat, lon, config.units, config.lang)
 
             val mapped = mapResponseToData(current, forecast, settings)
+            weatherDao.insertWeatherCache(WeatherEntity(data = mapped))
+            
             emit(Result.success(mapped))
         } catch (e: Exception) {
-            emit(Result.failure(e))
+            if (cached == null) {
+                emit(Result.failure(e))
+            }
         }
     }
     private data class WeatherConfig(val lang: String, val units: String)
@@ -102,4 +117,17 @@ class WeatherRepository(
     suspend fun insert(city: FavoriteCityEntity) = localDataSource.insertCity(city)
 
     suspend fun delete(city: FavoriteCityEntity) = localDataSource.deleteCity(city)
+    val allAlerts: Flow<List<AlertEntity>> = alertLocalDataSource.allAlerts
+
+    suspend fun insertAlert(alert: AlertEntity) {
+        alertLocalDataSource.insertAlert(alert)
+    }
+
+    suspend fun deleteAlert(alert: AlertEntity) {
+        alertLocalDataSource.deleteAlert(alert)
+    }
+
+    suspend fun getAlertById(id: String): AlertEntity? {
+        return alertLocalDataSource.getAlertById(id)
+    }
 }

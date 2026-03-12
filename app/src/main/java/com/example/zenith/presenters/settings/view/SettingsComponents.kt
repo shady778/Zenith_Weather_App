@@ -115,7 +115,7 @@ fun SettingsRow(
                 )
                 Text(
                     text = subtitle,
-                    fontSize = 11.sp, // Reduced from 12sp for more space
+                    fontSize = 11.sp,
                     color = ZenithColors.TextSecondary,
                     lineHeight = 14.sp
                 )

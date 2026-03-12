@@ -12,9 +12,12 @@ import androidx.compose.ui.unit.dp
 import com.example.zenith.ui.theme.ZenithColors
 import com.example.zenith.presenters.home.ui.WeatherBackground
 import com.example.zenith.presenters.settings.viewmodel.SettingsViewModel
+import com.example.zenith.data.model.localizeNumbers
+import androidx.compose.ui.platform.LocalContext
+import com.example.zenith.R
+import com.example.zenith.utils.StringHelper
 import com.example.zenith.ui.components.ZenithTopBar
 import com.example.zenith.presenters.favorites.view.MapPicker
-import com.example.zenith.data.model.localizeNumbers
 
 @Composable
 fun SettingsScreen(
@@ -34,27 +37,29 @@ fun SettingsScreen(
                 verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
                 item {
+                    val context = LocalContext.current
                     ZenithTopBar(
-                        title = if (isArabic) "الإعدادات" else "Settings",
-                        subtitle = if (isArabic) "خصّص تجربتك في Zenith" else "Customize your Zenith experience"
+                        title = StringHelper.getString(context, R.string.settings_title, isArabic),
+                        subtitle = StringHelper.getString(context, R.string.settings_subtitle, isArabic)
                     )
                 }
 
                 item {
-                    SettingsSection(title = if (isArabic) "الوحدات" else "Units") {
+                    val context = LocalContext.current
+                    SettingsSection(title = StringHelper.getString(context, R.string.units_section, isArabic)) {
                         SettingsRow(
                             icon = Icons.Rounded.Thermostat,
                             iconTint = Color(0xFFFF8A65),
                             iconBackground = Color(0x1FFF8A65),
-                            title = if (isArabic) "درجة الحرارة" else "Temperature",
-                            subtitle = if (isArabic) "الحالي: ${
+                            title = StringHelper.getString(context, R.string.temp_label, isArabic),
+                            subtitle = StringHelper.getString(context, R.string.temp_currently, isArabic).format(
                                 when (settings.tempUnit) {
-                                    "CELSIUS" -> "مئوية"
-                                    "FAHRENHEIT" -> "فهرنهايت"
-                                    "KELVIN" -> "كلفن"
+                                    "CELSIUS" -> StringHelper.getString(context, R.string.celsius, isArabic)
+                                    "FAHRENHEIT" -> StringHelper.getString(context, R.string.fahrenheit, isArabic)
+                                    "KELVIN" -> StringHelper.getString(context, R.string.kelvin, isArabic)
                                     else -> settings.tempUnit
                                 }
-                            }" else "Currently: ${settings.tempUnit}",
+                            ),
                             showDivider = true
                         ) {
                             SettingsToggleGroup(
@@ -70,26 +75,24 @@ fun SettingsScreen(
                             icon = Icons.Rounded.Air,
                             iconTint = Color(0xFF81C784),
                             iconBackground = Color(0x1481C784),
-                            title = if (isArabic) "سرعة الرياح" else "Wind Speed",
-                            subtitle = if (isArabic) "الحالي: ${
+                            title = StringHelper.getString(context, R.string.wind_speed_label, isArabic),
+                            subtitle = StringHelper.getString(context, R.string.wind_currently, isArabic).format(
                                 when (settings.windUnit) {
-                                    "MS" -> "م/ث"
-                                    "MPH" -> "ميل/س"
+                                    "MS" -> StringHelper.getString(context, R.string.ms, isArabic)
+                                    "MPH" -> StringHelper.getString(context, R.string.mph, isArabic)
                                     else -> settings.windUnit
                                 }
-                            }" else "Currently: ${settings.windUnit}"
+                            )
                         ) {
                             SettingsToggleGroup(
                                 options = WindUnit.entries.toList(),
                                 selected = WindUnit.valueOf(settings.windUnit),
                                 onSelect = { viewModel.updateSettings(settings.copy(windUnit = it.name)) },
                                 labelOf = { 
-                                    if (isArabic) {
-                                        when(it) {
-                                            WindUnit.MS -> "م/ث"
-                                            WindUnit.MPH -> "ميل/س"
-                                        }
-                                    } else it.label 
+                                    when(it) {
+                                        WindUnit.MS -> StringHelper.getString(context, R.string.ms, isArabic)
+                                        WindUnit.MPH -> StringHelper.getString(context, R.string.mph, isArabic)
+                                    }
                                 },
                                 modifier = Modifier.width(120.dp) // Reduced width
                             )
@@ -98,18 +101,17 @@ fun SettingsScreen(
                 }
 
                 item {
-                    SettingsSection(title = if (isArabic) "التفضيلات" else "Preferences") {
+                    val context = LocalContext.current
+                    SettingsSection(title = StringHelper.getString(context, R.string.preferences_section, isArabic)) {
                         SettingsRow(
                             icon = Icons.Rounded.Language,
                             iconTint = Color(0xFF80CBC4),
                             iconBackground = Color(0x1480CBC4),
-                            title = if (isArabic) "اللغة" else "Language",
-                            subtitle = if (isArabic) {
-                                when (settings.language) {
-                                    "ARABIC" -> "العربية"
-                                    else -> "الإنجليزية"
-                                }
-                            } else settings.language,
+                            title = StringHelper.getString(context, R.string.language_label, isArabic),
+                            subtitle = when (settings.language) {
+                                "ARABIC" -> StringHelper.getString(context, R.string.arabic, isArabic)
+                                else -> StringHelper.getString(context, R.string.english, isArabic)
+                            },
                             showDivider = true
                         ) {
                             SettingsToggleGroup(
@@ -117,7 +119,7 @@ fun SettingsScreen(
                                 selected = AppLanguage.valueOf(settings.language),
                                 onSelect = { viewModel.updateSettings(settings.copy(language = it.name)) },
                                 labelOf = { it.label },
-                                modifier = Modifier.width(130.dp) // Reduced width
+                                modifier = Modifier.width(130.dp)
                             )
                         }
 
@@ -125,8 +127,8 @@ fun SettingsScreen(
                             icon = Icons.Rounded.NotificationsActive,
                             iconTint = ZenithColors.Cyan,
                             iconBackground = ZenithColors.Cyan.copy(0.1f),
-                            title = if (isArabic) "الإشعارات" else "Notifications",
-                            subtitle = if (isArabic) "تحديثات الطقس اليومية" else "Daily weather updates"
+                            title = StringHelper.getString(context, R.string.notifications_label, isArabic),
+                            subtitle = StringHelper.getString(context, R.string.notifs_subtitle, isArabic)
                         ) {
                             Switch(
                                 checked = settings.notifsEnabled,
@@ -141,19 +143,18 @@ fun SettingsScreen(
                 }
 
                 item {
-                    SettingsSection(title = if (isArabic) "الموقع" else "Location") {
+                    val context = LocalContext.current
+                    SettingsSection(title = StringHelper.getString(context, R.string.location_section, isArabic)) {
                         SettingsRow(
                             icon = Icons.Rounded.LocationOn,
                             iconTint = Color(0xFF80D8FF),
                             iconBackground = Color(0x1480D8FF),
-                            title = if (isArabic) "المصدر" else "Source",
-                            subtitle = if (isArabic) {
-                                when (settings.locProvider) {
-                                    "GPS" -> "GPS"
-                                    "MANUAL" -> "يدوي"
-                                    else -> settings.locProvider
-                                }
-                            } else settings.locProvider
+                            title = StringHelper.getString(context, R.string.source_label, isArabic),
+                            subtitle = when (settings.locProvider) {
+                                "GPS" -> StringHelper.getString(context, R.string.gps, isArabic)
+                                "MANUAL" -> StringHelper.getString(context, R.string.manual, isArabic)
+                                else -> settings.locProvider
+                            }
                         ) {
                             SettingsToggleGroup(
                                 options = LocationProvider.entries.toList(),
@@ -167,12 +168,10 @@ fun SettingsScreen(
                                     }
                                 },
                                 labelOf = { 
-                                    if (isArabic) {
-                                        when(it) {
-                                            LocationProvider.GPS -> "GPS"
-                                            LocationProvider.MANUAL -> "يدوي"
-                                        }
-                                    } else it.label 
+                                    when(it) {
+                                        LocationProvider.GPS -> StringHelper.getString(context, R.string.gps, isArabic)
+                                        LocationProvider.MANUAL -> StringHelper.getString(context, R.string.manual, isArabic)
+                                    }
                                 },
                                 modifier = Modifier.width(120.dp) // Reduced width
                             )

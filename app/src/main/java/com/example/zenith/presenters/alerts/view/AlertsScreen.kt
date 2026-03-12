@@ -11,6 +11,10 @@ import androidx.compose.ui.unit.dp
 import com.example.zenith.presenters.alerts.viewmodel.AlertViewModel
 import com.example.zenith.data.datasource.local.database.AlertEntity
 import com.example.zenith.presenters.home.ui.WeatherBackground
+import androidx.compose.ui.platform.LocalContext
+import com.example.zenith.R
+import com.example.zenith.utils.StringHelper
+import androidx.compose.ui.text.font.FontWeight
 
 @Composable
 fun AlertsScreen(
@@ -36,9 +40,11 @@ fun AlertsScreen(
                         contentPadding = PaddingValues(bottom = 100.dp)
                     ) {
                         item {
+                            val context = LocalContext.current
                             Text(
-                                if (isArabic) "التنبيهات" else "Alerts",
+                                StringHelper.getString(context, R.string.alerts_title, isArabic),
                                 style = MaterialTheme.typography.headlineMedium,
+                                fontWeight = FontWeight.Bold,
                                 color = Color.White,
                                 modifier = Modifier.padding(16.dp)
                             )
