@@ -3,7 +3,7 @@ package com.example.zenith.presenters.alerts.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.zenith.data.datasource.local.database.AlertEntity
-import com.example.zenith.data.repo.AlertRepository
+import com.example.zenith.data.repo.WeatherRepository
 import com.example.zenith.presenters.alerts.logic.AlertScheduler
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class AlertViewModel(
-    private val repository: AlertRepository,
+    private val repository: WeatherRepository,
     private val scheduler: AlertScheduler
 ) : ViewModel() {
 

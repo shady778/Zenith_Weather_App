@@ -13,7 +13,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import com.example.zenith.R
+import com.example.zenith.utils.StringHelper
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.zenith.data.datasource.local.database.FavoriteCityEntity
@@ -56,8 +59,9 @@ fun FavoritesScreen(
             topBar = {
                 CenterAlignedTopAppBar(
                     title = {
+                        val context = LocalContext.current
                         Text(
-                            if (isArabic) "المدن المفضلة" else "Favorite Cities",
+                            StringHelper.getString(context, R.string.favorites_title, isArabic),
                             fontWeight = FontWeight.Bold,
                             color = Color.White
                         )
@@ -75,7 +79,8 @@ fun FavoritesScreen(
                     shape = CircleShape,
                     modifier = Modifier.padding(bottom = 16.dp, end = 8.dp)
                 ) {
-                    Icon(Icons.Rounded.Add, contentDescription = if (isArabic) "إضافة مدينة" else "Add City", modifier = Modifier.size(32.dp))
+                    val context = LocalContext.current
+                    Icon(Icons.Rounded.Add, contentDescription = StringHelper.getString(context, R.string.add_city_desc, isArabic), modifier = Modifier.size(32.dp))
                 }
             }
         ) { padding ->
@@ -167,6 +172,7 @@ fun FavoritesScreen(
 
 @Composable
 fun EmptyState(isArabic: Boolean, modifier: Modifier = Modifier) {
+    val context = LocalContext.current
     Column(
         modifier = modifier.padding(40.dp),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -187,14 +193,14 @@ fun EmptyState(isArabic: Boolean, modifier: Modifier = Modifier) {
         }
         Spacer(Modifier.height(24.dp))
         Text(
-            if (isArabic) "لا توجد مدن مفضلة" else "No Favorites Yet",
+            StringHelper.getString(context, R.string.no_favorites_title, isArabic),
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
             color = Color.White
         )
         Spacer(Modifier.height(8.dp))
         Text(
-            if (isArabic) "اضغط على زر + لإضافة مدنك المفضلة وتتبع حالة الطقس فيها." else "Tap the + button to add your favorite cities and track their weather.",
+            StringHelper.getString(context, R.string.no_favorites_desc, isArabic),
             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
             color = ZenithColors.TextSecondary,
             lineHeight = 22.sp

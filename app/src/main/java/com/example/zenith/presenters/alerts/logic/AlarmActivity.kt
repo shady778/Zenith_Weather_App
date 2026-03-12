@@ -19,7 +19,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -152,103 +151,107 @@ fun AlarmScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(Color(0xFF0F172A), Color(0xFF1E293B), Color(0xFF0F172A))
-                )
-            ),
+            .background(Color.Black.copy(alpha = 0.6f)),
         contentAlignment = Alignment.Center
     ) {
-        Box(
+        Card(
             modifier = Modifier
-                .size(300.dp)
-                .background(ZenithColors.Cyan.copy(0.05f), CircleShape)
-        )
-
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(32.dp)
+                .fillMaxWidth(0.9f)
+                .wrapContentHeight()
+                .padding(16.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = Color(0xFF1E293B).copy(alpha = 0.95f)
+            ),
+            shape = RoundedCornerShape(32.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
         ) {
-            val infiniteTransition = rememberInfiniteTransition(label = "pulse")
-            val scale by infiniteTransition.animateFloat(
-                initialValue = 1f,
-                targetValue = 1.1f,
-                animationSpec = infiniteRepeatable(
-                    animation = tween(1000, easing = LinearEasing),
-                    repeatMode = RepeatMode.Reverse
-                ),
-                label = "scale"
-            )
-
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier.padding(bottom = 40.dp)
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.padding(24.dp)
             ) {
+                val infiniteTransition = rememberInfiniteTransition(label = "pulse")
+                val scale by infiniteTransition.animateFloat(
+                    initialValue = 1f,
+                    targetValue = 1.05f,
+                    animationSpec = infiniteRepeatable(
+                        animation = tween(1200, easing = FastOutSlowInEasing),
+                        repeatMode = RepeatMode.Reverse
+                    ),
+                    label = "scale"
+                )
+
                 Box(
-                    modifier = Modifier
-                        .size(180.dp)
-                        .scale(scale)
-                        .background(ZenithColors.Cyan.copy(0.1f), CircleShape)
-                )
-                LottieAnimation(
-                    composition = composition,
-                    progress = { progress },
-                    modifier = Modifier.size(140.dp)
-                )
-            }
-
-            Text(
-                text = trigger.uppercase(),
-                color = ZenithColors.Cyan,
-                fontWeight = FontWeight.Black,
-                fontSize = 14.sp,
-                letterSpacing = 4.sp,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-
-            Text(
-                text = label,
-                color = Color.White,
-                fontSize = 32.sp,
-                fontWeight = FontWeight.ExtraBold,
-                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                modifier = Modifier.padding(bottom = 24.dp)
-            )
-            Surface(
-                color = Color.White.copy(0.05f),
-                shape = RoundedCornerShape(24.dp),
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
-            ) {
-                Row(
-                    modifier = Modifier.padding(20.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier.padding(vertical = 16.dp)
                 ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        val mainDisplay = reading.ifBlank { temp }
-                        Text(mainDisplay, color = Color.White, fontSize = 48.sp, fontWeight = FontWeight.Black)
-                        Text(desc, color = Color.White.copy(0.6f), fontSize = 16.sp, fontWeight = FontWeight.Medium)
+                    Box(
+                        modifier = Modifier
+                            .size(140.dp)
+                            .scale(scale)
+                            .background(ZenithColors.Cyan.copy(0.1f), CircleShape)
+                    )
+                    LottieAnimation(
+                        composition = composition,
+                        progress = { progress },
+                        modifier = Modifier.size(100.dp)
+                    )
+                }
+
+                Text(
+                    text = trigger.uppercase(),
+                    color = ZenithColors.Cyan,
+                    fontWeight = FontWeight.Black,
+                    fontSize = 12.sp,
+                    letterSpacing = 2.sp,
+                    modifier = Modifier.padding(bottom = 4.dp)
+                )
+
+                Text(
+                    text = label,
+                    color = Color.White,
+                    fontSize = 26.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+
+                Surface(
+                    color = Color.White.copy(0.05f),
+                    shape = RoundedCornerShape(20.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier.padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            val mainDisplay = reading.ifBlank { temp }
+                            Text(mainDisplay, color = Color.White, fontSize = 36.sp, fontWeight = FontWeight.Black)
+                            Text(desc, color = Color.White.copy(0.6f), fontSize = 14.sp, fontWeight = FontWeight.Medium)
+                        }
                     }
                 }
-            }
 
-            Spacer(modifier = Modifier.weight(1f))
-            Button(
-                onClick = onDismiss,
-                colors = ButtonDefaults.buttonColors(containerColor = ZenithColors.Cyan),
-                shape = RoundedCornerShape(24.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(64.dp)
-            ) {
-                Icon(Icons.Rounded.Close, null, tint = Color.Black)
-                Spacer(Modifier.width(8.dp))
-                Text(
-                    if (isArabic) "إغلاق التنبيه" else "DISMISS ALERT", 
-                    color = Color.Black, 
-                    fontWeight = FontWeight.Black, 
-                    fontSize = 16.sp
-                )
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Button(
+                    onClick = onDismiss,
+                    colors = ButtonDefaults.buttonColors(containerColor = ZenithColors.Cyan),
+                    shape = RoundedCornerShape(20.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp)
+                ) {
+                    Icon(Icons.Rounded.Close, null, tint = Color.Black)
+                    Spacer(Modifier.width(8.dp))
+                    Text(
+                        if (isArabic) "إغلاق التنبيه" else "DISMISS ALERT", 
+                        color = Color.Black, 
+                        fontWeight = FontWeight.Black, 
+                        fontSize = 15.sp
+                    )
+                }
             }
         }
     }

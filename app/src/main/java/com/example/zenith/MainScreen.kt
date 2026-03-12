@@ -19,9 +19,6 @@ import com.example.zenith.presenters.settings.viewmodel.SettingsViewModel
 import com.example.zenith.presenters.settings.viewmodel.SettingsViewModelFactory
 import com.example.zenith.presenters.alerts.viewmodel.AlertViewModel
 import com.example.zenith.presenters.alerts.viewmodel.AlertViewModelFactory
-import com.example.zenith.data.repo.AlertRepository
-import com.example.zenith.data.datasource.local.database.AlertLocalDataSource
-import com.example.zenith.data.db.AppDatabase
 import com.example.zenith.presenters.alerts.logic.AlertScheduler
 
 
@@ -44,7 +41,7 @@ fun MainScreen(weatherViewModel: WeatherViewModel) {
     val context = LocalContext.current
     val alertViewModel: AlertViewModel = viewModel(
         factory = AlertViewModelFactory(
-            AlertRepository(AlertLocalDataSource(AppDatabase.getDatabase(context).alertDao())),
+            weatherViewModel.repository,
             AlertScheduler(context)
         )
     )

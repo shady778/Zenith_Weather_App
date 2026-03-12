@@ -30,4 +30,82 @@
     <string name="weather_light_rain">Light Rain</string>
     <string name="weather_moderate_rain">Moderate Rain</string>
     <string name="weather_heavy_intensity_rain">Heavy Intensity Rain</string>
+
+    <!-- Offline Strings -->
+    <string name="offline_msg">You are offline</string>
+    <string name="no_internet_title">Oops! No Internet</string>
+    <string name="no_internet_desc">This feature requires an active internet connection. Please check your network and try again.</string>
+    <string name="got_it">Got it</string>
+
+    <!-- Weather Stats -->
+    <string name="wind_label">Wind</string>
+    <string name="clouds_label">Clouds</string>
+    <string name="humidity_label">Humidity</string>
+    <string name="pressure_label">Pressure</string>
+    <string name="hourly_forecast_title">Hourly Forecast</string>
+    <string name="next_days_title">Next Days</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_subtitle">Customize your Zenith experience</string>
+    <string name="units_section">Units</string>
+    <string name="temp_label">Temperature</string>
+    <string name="temp_currently">Currently: %1$s</string>
+    <string name="celsius">Celsius</string>
+    <string name="fahrenheit">Fahrenheit</string>
+    <string name="kelvin">Kelvin</string>
+    <string name="wind_speed_label">Wind Speed</string>
+    <string name="wind_currently">Currently: %1$s</string>
+    <string name="ms">m/s</string>
+    <string name="mph">mph</string>
+    <string name="preferences_section">Preferences</string>
+    <string name="language_label">Language</string>
+    <string name="arabic">Arabic</string>
+    <string name="english">English</string>
+    <string name="notifications_label">Notifications</string>
+    <string name="notifs_subtitle">Daily weather updates</string>
+    <string name="location_section">Location</string>
+    <string name="source_label">Source</string>
+    <string name="gps">GPS</string>
+    <string name="manual">Manual</string>
+
+    <!-- Favorites Screen -->
+    <string name="favorites_title">Favorite Cities</string>
+    <string name="add_city_desc">Add City</string>
+    <string name="no_favorites_title">No Favorites Yet</string>
+    <string name="no_favorites_desc">Tap the + button to add your favorite cities and track their weather.</string>
+
+    <!-- Alerts Screen -->
+    <string name="alerts_title">Alerts</string>
+    <string name="no_alerts_title">No alerts set</string>
+    <string name="no_alerts_desc">Tap + to wake up your weather alerts</string>
+    <string name="customize_alert">Customize Alert</string>
+    <string name="choose_notif_time">Choose when to be notified about the weather</string>
+    <string name="select_time">Select Time</string>
+    <string name="weather_trigger">Weather Trigger</string>
+    <string name="threshold_value">Threshold Value</string>
+    <string name="alert_mode">Alert Mode</string>
+    <string name="frequency">Frequency</string>
+    <string name="alert_label">Alert Label</string>
+    <string name="label_placeholder">e.g., Rain Umbrella</string>
+    <string name="default_alert_label">Weather Update</string>
+    <string name="enable_alert">Enable Alert</string>
+
+    <!-- Enums Labels -->
+    <string name="trigger_any">Any Weather</string>
+    <string name="trigger_temp">Temp</string>
+    <string name="trigger_wind">Wind</string>
+    <string name="trigger_rain">Rain</string>
+    <string name="trigger_storm">Storm</string>
+    <string name="trigger_clear">Clear</string>
+    <string name="trigger_snow">Snow</string>
+    <string name="trigger_clouds">Clouds</string>
+    <string name="mode_alarm">Alarm</string>
+    <string name="mode_notif">Notification</string>
+    <string name="repeat_once">Once</string>
+    <string name="repeat_daily">Every Day</string>
+    <string name="repeat_weekdays">Weekdays</string>
+    <string name="repeat_weekends">Weekends</string>
+    <string name="delete_item">Delete</string>
+    <string name="cancel">Cancel</string>
 </resources>

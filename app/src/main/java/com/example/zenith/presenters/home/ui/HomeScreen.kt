@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.zenith.presenters.home.viewmodel.WeatherViewModel
+import com.example.zenith.ui.theme.ZenithColors
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -22,7 +23,7 @@ fun HomeScreen(viewModel: WeatherViewModel) {
     Box(modifier = Modifier.fillMaxSize()) {
         if (uiState.isLoading) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(color = Color.Cyan)
+                CircularProgressIndicator(color = ZenithColors.Cyan)
             }
         }
 

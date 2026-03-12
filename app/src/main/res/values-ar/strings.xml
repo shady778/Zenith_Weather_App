@@ -29,4 +29,80 @@
     <string name="weather_light_rain">مطر خفيف</string>
     <string name="weather_moderate_rain">مطر متوسط</string>
     <string name="weather_heavy_intensity_rain">مطر غزير</string>
+
+    <string name="offline_msg">أنت الآن في وضع عدم الاتصال</string>
+    <string name="no_internet_title">عذراً! لا يوجد إنترنت</string>
+    <string name="no_internet_desc">هذه الخاصية تتطلب اتصالاً بالإنترنت. يرجى التحقق من الشبكة والمحاولة مرة أخرى.</string>
+    <string name="got_it">حسناً</string>
+
+    <string name="wind_label">الرياح</string>
+    <string name="clouds_label">السحب</string>
+    <string name="humidity_label">الرطوبة</string>
+    <string name="pressure_label">الضغط</string>
+    <string name="hourly_forecast_title">التوقعات بالساعة</string>
+    <string name="next_days_title">الأيام القادمة</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_title">الإعدادات</string>
+    <string name="settings_subtitle">خصّص تجربتك في Zenith</string>
+    <string name="units_section">الوحدات</string>
+    <string name="temp_label">درجة الحرارة</string>
+    <string name="temp_currently">الحالي: %1$s</string>
+    <string name="celsius">مئوية</string>
+    <string name="fahrenheit">فهرنهايت</string>
+    <string name="kelvin">كلفن</string>
+    <string name="wind_speed_label">سرعة الرياح</string>
+    <string name="wind_currently">الحالي: %1$s</string>
+    <string name="ms">م/ث</string>
+    <string name="mph">ميل/س</string>
+    <string name="preferences_section">التفضيلات</string>
+    <string name="language_label">اللغة</string>
+    <string name="arabic">العربية</string>
+    <string name="english">الإنجليزية</string>
+    <string name="notifications_label">الإشعارات</string>
+    <string name="notifs_subtitle">تحديثات الطقس اليومية</string>
+    <string name="location_section">الموقع</string>
+    <string name="source_label">المصدر</string>
+    <string name="gps">GPS</string>
+    <string name="manual">يدوي</string>
+
+    <!-- Favorites Screen -->
+    <string name="favorites_title">المدن المفضلة</string>
+    <string name="add_city_desc">إضافة مدينة</string>
+    <string name="no_favorites_title">لا توجد مدن مفضلة</string>
+    <string name="no_favorites_desc">اضغط على زر + لإضافة مدنك المفضلة وتتبع حالة الطقس فيها.</string>
+
+    <!-- Alerts Screen -->
+    <string name="alerts_title">التنبيهات</string>
+    <string name="no_alerts_title">لا توجد تنبيهات</string>
+    <string name="no_alerts_desc">اضغط على + لإضافة تنبيهات طقس جديدة</string>
+    <string name="customize_alert">تخصيص التنبيه</string>
+    <string name="choose_notif_time">اختر متى تريد استقبال إشعارات الطقس</string>
+    <string name="select_time">اختر الوقت</string>
+    <string name="weather_trigger">محفز الطقس</string>
+    <string name="threshold_value">القيمة المحددة</string>
+    <string name="alert_mode">نوع التنبيه</string>
+    <string name="frequency">التكرار</string>
+    <string name="alert_label">عنوان التنبيه</string>
+    <string name="label_placeholder">مثلاً: مظلة المطر</string>
+    <string name="default_alert_label">تنبيه الطقس</string>
+    <string name="enable_alert">تفعيل التنبيه</string>
+
+    <!-- Enums Labels -->
+    <string name="trigger_any">أي طقس</string>
+    <string name="trigger_temp">حرارة</string>
+    <string name="trigger_wind">رياح</string>
+    <string name="trigger_rain">مطر</string>
+    <string name="trigger_storm">عواصف</string>
+    <string name="trigger_clear">صافي</string>
+    <string name="trigger_snow">ثلج</string>
+    <string name="trigger_clouds">غيوم</string>
+    <string name="mode_alarm">منبه</string>
+    <string name="mode_notif">إشعار</string>
+    <string name="repeat_once">مرة واحدة</string>
+    <string name="repeat_daily">يومياً</string>
+    <string name="repeat_weekdays">أيام العمل</string>
+    <string name="repeat_weekends">عطلة الأسبوع</string>
+    <string name="delete_item">حذف</string>
+    <string name="cancel">إلغاء</string>
 </resources>

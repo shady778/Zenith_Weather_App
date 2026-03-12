@@ -13,14 +13,13 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.runtime.*
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.zenith.data.datasource.location.LocationProvider
+import com.example.zenith.data.datasource.local.database.LocalDataSource
+import com.example.zenith.data.location.LocationProvider
 import com.example.zenith.data.datasource.remote.WeatherRemoteDataSource
 import com.example.zenith.data.network.RetrofitInstance
-import com.example.zenith.data.datasource.local.database.FavoriteLocalDataSource
 import com.example.zenith.data.db.AppDatabase
 import com.example.zenith.data.local.datastore.SettingsDataStore
 import com.example.zenith.data.repo.WeatherRepository
-
 import com.example.zenith.presenters.home.ui.ErrorScreen
 import com.example.zenith.ui.theme.ZenithTheme
 import com.example.zenith.presenters.home.viewmodel.WeatherViewModel
@@ -40,9 +39,11 @@ class MainActivity : ComponentActivity() {
 
         val apiService = RetrofitInstance.apiService
         val remoteDataSource = WeatherRemoteDataSource(apiService)
+        val alertDao   = AppDatabase.getDatabase(this).alertDao()
+        val favDao = AppDatabase.getDatabase(this).favoriteCityDao()
         val locationProvider = LocationProvider(this)
         val database = AppDatabase.getDatabase(this)
-        val localDataSource = FavoriteLocalDataSource(database.favoriteCityDao())
+        val localDataSource = LocalDataSource(favDao, alertDao)
         val settingsDataStore = SettingsDataStore(this)
         val networkMonitor = NetworkMonitor(this)
         val repository = WeatherRepository(
@@ -50,7 +51,8 @@ class MainActivity : ComponentActivity() {
             locationProvider,
             localDataSource,
             database.weatherDao(),
-            settingsDataStore
+            settingsDataStore,
+            LocalDataSource(favDao,alertDao)
         )
         val factory = WeatherViewModelFactory(repository, networkMonitor)
 

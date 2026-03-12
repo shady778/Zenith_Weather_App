@@ -12,16 +12,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-
+import com.example.zenith.R
+import com.example.zenith.ui.theme.ZenithColors
+import com.example.zenith.utils.StringHelper
 
 @Composable
 fun OfflineBanner(isOnline: Boolean, isArabic: Boolean) {
+    val context = LocalContext.current
     AnimatedVisibility(
         visible = !isOnline,
         enter = expandVertically() + fadeIn(),
@@ -49,7 +53,7 @@ fun OfflineBanner(isOnline: Boolean, isArabic: Boolean) {
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = if (isArabic) "أنت الآن في وضع عدم الاتصال" else "You are offline",
+                    text = StringHelper.getString(context, R.string.offline_msg, isArabic),
                     color = Color.White,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold
@@ -61,6 +65,7 @@ fun OfflineBanner(isOnline: Boolean, isArabic: Boolean) {
 
 @Composable
 fun NoInternetDialog(isArabic: Boolean, onDismiss: () -> Unit) {
+    val context = LocalContext.current
     Dialog(
         onDismissRequest = onDismiss,
         properties = DialogProperties(usePlatformDefaultWidth = false)
@@ -93,7 +98,7 @@ fun NoInternetDialog(isArabic: Boolean, onDismiss: () -> Unit) {
                     Icon(
                         Icons.Rounded.WifiOff,
                         contentDescription = null,
-                        tint = Color.Cyan,
+                        tint = ZenithColors.Cyan,
                         modifier = Modifier.size(48.dp)
                     )
                 }
@@ -101,7 +106,7 @@ fun NoInternetDialog(isArabic: Boolean, onDismiss: () -> Unit) {
                 Spacer(modifier = Modifier.height(24.dp))
 
                 Text(
-                    text = if (isArabic) "عذراً! لا يوجد إنترنت" else "Oops! No Internet",
+                    text = StringHelper.getString(context, R.string.no_internet_title, isArabic),
                     color = Color.White,
                     fontSize = 22.sp,
                     fontWeight = FontWeight.ExtraBold,
@@ -111,9 +116,7 @@ fun NoInternetDialog(isArabic: Boolean, onDismiss: () -> Unit) {
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Text(
-                    text = if (isArabic) 
-                        "هذه الخاصية تتطلب اتصالاً بالإنترنت. يرجى التحقق من الشبكة والمحاولة مرة أخرى." 
-                        else "This feature requires an active internet connection. Please check your network and try again.",
+                    text = StringHelper.getString(context, R.string.no_internet_desc, isArabic),
                     color = Color.White.copy(alpha = 0.7f),
                     fontSize = 16.sp,
                     textAlign = TextAlign.Center,
@@ -126,13 +129,13 @@ fun NoInternetDialog(isArabic: Boolean, onDismiss: () -> Unit) {
                     onClick = onDismiss,
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Cyan,
+                        containerColor = ZenithColors.Cyan,
                         contentColor = Color.Black
                     ),
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Text(
-                        text = if (isArabic) "حسناً" else "Got it",
+                        text = StringHelper.getString(context, R.string.got_it, isArabic),
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp
                     )

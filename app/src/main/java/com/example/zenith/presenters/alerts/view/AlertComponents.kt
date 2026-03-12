@@ -14,10 +14,13 @@ import androidx.compose.ui.*
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.*
-import com.airbnb.lottie.compose.*
 import com.example.zenith.R
+import com.example.zenith.utils.StringHelper
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.airbnb.lottie.compose.*
 import com.example.zenith.ui.theme.ZenithColors
 import com.example.zenith.data.datasource.local.database.AlertEntity
 import java.util.UUID
@@ -66,20 +69,21 @@ fun AddAlertBottomSheet(isArabic: Boolean, onDismiss: () -> Unit, onSave: (Alert
                 .navigationBarsPadding()
                 .verticalScroll(rememberScrollState())
         ) {
+            val context = LocalContext.current
             Text(
-                if (isArabic) "تخصيص التنبيه" else "Customize Alert",
+                StringHelper.getString(context, R.string.customize_alert, isArabic),
                 fontSize = 24.sp,
                 fontWeight = FontWeight.ExtraBold,
                 color = Color.White
             )
             Text(
-                if (isArabic) "اختر متى تريد استقبال إشعارات الطقس" else "Choose when to be notified about the weather",
+                StringHelper.getString(context, R.string.choose_notif_time, isArabic),
                 fontSize = 14.sp,
                 color = Color.White.copy(0.5f),
                 modifier = Modifier.padding(bottom = 24.dp)
             )
 
-            SheetSectionLabel(if (isArabic) "اختر الوقت" else "Select Time", Icons.Rounded.Schedule)
+            SheetSectionLabel(StringHelper.getString(context, R.string.select_time, isArabic), Icons.Rounded.Schedule)
             
             Box(
                 modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
@@ -106,7 +110,7 @@ fun AddAlertBottomSheet(isArabic: Boolean, onDismiss: () -> Unit, onSave: (Alert
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            SheetSectionLabel(if (isArabic) "محفز الطقس" else "Weather Trigger", Icons.Rounded.FilterList)
+            SheetSectionLabel(StringHelper.getString(context, R.string.weather_trigger, isArabic), Icons.Rounded.FilterList)
             TriggerSelector(selected = selectedTrigger, isArabic = isArabic, onSelect = { 
                 selectedTrigger = it
                 thresholdValue = when(it) {
@@ -131,7 +135,7 @@ fun AddAlertBottomSheet(isArabic: Boolean, onDismiss: () -> Unit, onSave: (Alert
                 }
                 
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    SheetSectionLabel(if (isArabic) "القيمة المحددة" else "Threshold Value", Icons.Rounded.Tune)
+                    SheetSectionLabel(StringHelper.getString(context, R.string.threshold_value, isArabic), Icons.Rounded.Tune)
                     Spacer(Modifier.weight(1f))
                     Text(
                         "${thresholdValue.toInt()}${selectedTrigger.unit}",
@@ -153,22 +157,22 @@ fun AddAlertBottomSheet(isArabic: Boolean, onDismiss: () -> Unit, onSave: (Alert
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            SheetSectionLabel(if (isArabic) "نوع التنبيه" else "Alert Mode", Icons.Rounded.Settings)
+            SheetSectionLabel(StringHelper.getString(context, R.string.alert_mode, isArabic), Icons.Rounded.Settings)
             AlertTypeToggle(selected = selectedType, isArabic = isArabic, onSelect = { selectedType = it })
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            SheetSectionLabel(if (isArabic) "التكرار" else "Frequency", Icons.Rounded.Repeat)
+            SheetSectionLabel(StringHelper.getString(context, R.string.frequency, isArabic), Icons.Rounded.Repeat)
             RepeatSelector(selected = selectedRepeat, isArabic = isArabic, onSelect = { selectedRepeat = it })
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            SheetSectionLabel(if (isArabic) "عنوان التنبيه" else "Alert Label", Icons.Rounded.Label)
+            SheetSectionLabel(StringHelper.getString(context, R.string.alert_label, isArabic), Icons.Rounded.Label)
             OutlinedTextField(
                 value = alertLabel,
                 onValueChange = { alertLabel = it },
                 modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text(if (isArabic) "مثلاً: مظلة المطر" else "e.g., Rain Umbrella", color = Color.White.copy(0.3f)) },
+                placeholder = { Text(StringHelper.getString(context, R.string.label_placeholder, isArabic), color = Color.White.copy(0.3f)) },
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedTextColor = Color.White,
                     unfocusedTextColor = Color.White,
@@ -197,14 +201,14 @@ fun AddAlertBottomSheet(isArabic: Boolean, onDismiss: () -> Unit, onSave: (Alert
                             triggerValue = if (selectedTrigger in listOf(WeatherTrigger.TEMPERATURE, WeatherTrigger.WIND_SPEED, WeatherTrigger.RAIN, WeatherTrigger.CLOUDS)) thresholdValue.toInt() else null,
                             repeat = selectedRepeat,
                             isEnabled = true,
-                            label = alertLabel.ifBlank { if (isArabic) "تنبيه الطقس" else "Weather Update" }
+                            label = alertLabel.ifBlank { StringHelper.getString(context, R.string.default_alert_label, isArabic) }
                         )
                     )
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = ZenithColors.Cyan),
                 shape = RoundedCornerShape(16.dp)
             ) {
-                Text(if (isArabic) "تفعيل التنبيه" else "Enable Alert", color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Text(StringHelper.getString(context, R.string.enable_alert, isArabic), color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 16.sp)
             }
             Spacer(modifier = Modifier.height(16.dp))
         }
@@ -239,7 +243,7 @@ fun TriggerSelector(selected: WeatherTrigger, isArabic: Boolean, onSelect: (Weat
                     modifier = Modifier.size(24.dp)
                 )
                 Text(
-                    trigger.getLabel(isArabic),
+                    trigger.getLabel(LocalContext.current, isArabic),
                     color = if (isSelected) Color.White else Color.White.copy(0.4f),
                     fontSize = 11.sp,
                     modifier = Modifier.padding(top = 4.dp)
@@ -251,6 +255,7 @@ fun TriggerSelector(selected: WeatherTrigger, isArabic: Boolean, onSelect: (Weat
 
 @Composable
 fun AlertItem(alert: AlertEntity, isArabic: Boolean, onDelete: () -> Unit, onToggle: (AlertEntity) -> Unit) {
+    val context = LocalContext.current
     Card(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White.copy(0.05f)),
@@ -298,7 +303,7 @@ fun AlertItem(alert: AlertEntity, isArabic: Boolean, onDelete: () -> Unit, onTog
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = alert.getFormattedTime(isArabic),
+                    text = alert.getFormattedTime(context, isArabic),
                     color = Color.White,
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Black,
@@ -308,14 +313,14 @@ fun AlertItem(alert: AlertEntity, isArabic: Boolean, onDelete: () -> Unit, onTog
                     Icon(alert.type.icon, null, tint = ZenithColors.Cyan, modifier = Modifier.size(12.dp))
                     Spacer(Modifier.width(4.dp))
                     Text(
-                        alert.type.getLabel(isArabic),
+                        alert.type.getLabel(context, isArabic),
                         color = ZenithColors.Cyan,
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold
                     )
                     Text(" • ", color = Color.White.copy(0.2f))
                     Text(
-                        alert.trigger.getLabel(isArabic) + (if (alert.triggerValue != null) " (${alert.triggerValue}${alert.trigger.unit})" else ""),
+                        alert.trigger.getLabel(context, isArabic) + (if (alert.triggerValue != null) " (${alert.triggerValue}${alert.trigger.unit})" else ""),
                         color = alert.trigger.color,
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold
@@ -331,7 +336,7 @@ fun AlertItem(alert: AlertEntity, isArabic: Boolean, onDelete: () -> Unit, onTog
                     )
                     Spacer(Modifier.width(4.dp))
                     Text(
-                        text = alert.repeat.getLabel(isArabic),
+                        text = alert.repeat.getLabel(context, isArabic),
                         color = Color.White.copy(0.4f),
                         fontSize = 10.sp,
                         fontWeight = FontWeight.Medium
@@ -399,8 +404,9 @@ fun RepeatSelector(selected: RepeatMode, isArabic: Boolean, onSelect: (RepeatMod
                     ) { onSelect(mode) },
                 contentAlignment = Alignment.Center
             ) {
+                val context = LocalContext.current
                 Text(
-                    text = mode.getLabel(isArabic),
+                    text = mode.getLabel(context, isArabic),
                     color = if (isSelected) ZenithColors.Cyan else Color.White.copy(0.6f),
                     fontSize = 12.sp,
                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
@@ -437,7 +443,8 @@ fun AlertTypeToggle(selected: AlertType, isArabic: Boolean, onSelect: (AlertType
                     ) { onSelect(type) },
                 contentAlignment = Alignment.Center
             ) {
-                Text(type.getLabel(isArabic), color = if (isSelected) Color.Black else Color.White, fontWeight = FontWeight.Bold)
+                val context = LocalContext.current
+                Text(type.getLabel(context, isArabic), color = if (isSelected) Color.Black else Color.White, fontWeight = FontWeight.Bold)
             }
         }
     }
@@ -462,14 +469,15 @@ fun AlertsEmptyState(isArabic: Boolean) {
             modifier = Modifier.size(200.dp)
         )
         Spacer(modifier = Modifier.height(16.dp))
+        val context = LocalContext.current
         Text(
-            if (isArabic) "لا توجد تنبيهات" else "No alerts set",
+            StringHelper.getString(context, R.string.no_alerts_title, isArabic),
             color = Color.White.copy(0.6f),
             fontWeight = FontWeight.Bold,
             fontSize = 18.sp
         )
         Text(
-            if (isArabic) "اضغط على + لإضافة تنبيهات طقس جديدة" else "Tap + to wake up your weather alerts",
+            StringHelper.getString(context, R.string.no_alerts_desc, isArabic),
             color = Color.White.copy(0.3f)
         )
     }

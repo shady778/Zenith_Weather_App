@@ -16,12 +16,16 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.*
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.airbnb.lottie.compose.*
 import com.example.zenith.R
 import com.example.zenith.data.model.WeatherData
 import com.example.zenith.data.model.DailyForecast
 import com.example.zenith.data.model.HourlyForecast
+import com.example.zenith.utils.StringHelper
 
 @RawRes
 fun iconCodeToLottie(iconCode: String): Int {
@@ -113,6 +117,7 @@ fun WeatherHeader(data: WeatherData, isDay: Boolean) {
 
 @Composable
 fun MainWeatherCard(data: WeatherData, isDay: Boolean) {
+    val context = LocalContext.current
     val textColor = if (isDay) Color.Black.copy(0.8f) else Color.White
 
     Box(
@@ -159,10 +164,10 @@ fun MainWeatherCard(data: WeatherData, isDay: Boolean) {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceAround
             ) {
-                QuickStat(Icons.Rounded.Air, data.windSpeed, if (data.isArabic) "الرياح" else "Wind", isDay)
-                QuickStat(Icons.Rounded.Cloud, "${data.clouds}%", if (data.isArabic) "السحب" else "Clouds", isDay)
-                QuickStat(Icons.Rounded.Opacity, "${data.humidity}", if (data.isArabic) "الرطوبة" else "Humidity", isDay)
-                QuickStat(Icons.Rounded.Compress, "${data.pressure} hPa", if (data.isArabic) "الضغط" else "Pressure", isDay)
+                QuickStat(Icons.Rounded.Air, data.windSpeed, StringHelper.getString(context, R.string.wind_label, data.isArabic), isDay)
+                QuickStat(Icons.Rounded.Cloud, "${data.clouds}%", StringHelper.getString(context, R.string.clouds_label, data.isArabic), isDay)
+                QuickStat(Icons.Rounded.Opacity, "${data.humidity}", StringHelper.getString(context, R.string.humidity_label, data.isArabic), isDay)
+                QuickStat(Icons.Rounded.Compress, "${data.pressure} hPa", StringHelper.getString(context, R.string.pressure_label, data.isArabic), isDay)
             }
         }
     }
@@ -180,8 +185,9 @@ fun QuickStat(icon: ImageVector, value: String, label: String, isDay: Boolean) {
 
 @Composable
 fun HourlyForecastRow(data: List<HourlyForecast>, isDay: Boolean, isArabic: Boolean = false) {
+    val context = LocalContext.current
     Column {
-        SectionTitle(if (isArabic) "التوقعات بالساعة" else "Hourly Forecast", isDay)
+        SectionTitle(StringHelper.getString(context, R.string.hourly_forecast_title, isArabic), isDay)
         Spacer(Modifier.height(12.dp))
         LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             items(data.size) { index ->
@@ -215,8 +221,9 @@ fun HourlyForecastRow(data: List<HourlyForecast>, isDay: Boolean, isArabic: Bool
 
 @Composable
 fun DailyForecastList(data: List<DailyForecast>, isDay: Boolean, isArabic: Boolean = false) {
+    val context = LocalContext.current
     Column {
-        SectionTitle(if (isArabic) "الأيام القادمة" else "Next Days", isDay)
+        SectionTitle(StringHelper.getString(context, R.string.next_days_title, isArabic), isDay)
         Spacer(Modifier.height(12.dp))
         Column(
             modifier = Modifier

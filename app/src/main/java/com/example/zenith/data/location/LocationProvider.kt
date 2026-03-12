@@ -1,4 +1,4 @@
-package com.example.zenith.data.datasource.location
+package com.example.zenith.data.location
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -18,7 +18,6 @@ class LocationProvider (context: Context) {
                 if (location != null) {
                     trySend(Pair(location.latitude, location.longitude))
                 } else {
-                    // Fallback to last known location if current is null
                     fusedLocationClient.lastLocation.addOnSuccessListener { lastLoc ->
                         if (lastLoc != null) trySend(Pair(lastLoc.latitude, lastLoc.longitude))
                         else close()
