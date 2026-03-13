@@ -45,7 +45,7 @@ fun mapResponseToData(
         HourlyForecast(
             time = hourSdf.format(Date(it.dt * 1000L)).localizeNumbers(isArabic),
             temp = "${temp}°".localizeNumbers(isArabic),
-            icon = it.weather[0].icon
+            icon = it.weather.firstOrNull()?.icon ?: "01d"
         )
     }
 
@@ -57,8 +57,8 @@ fun mapResponseToData(
             day = daySdf.format(Date(it.dt * 1000L)),
             highTemp = "${high}°".localizeNumbers(isArabic),
             lowTemp = "${low}°".localizeNumbers(isArabic),
-            description = it.weather[0].description,
-            icon = it.weather[0].icon
+            description = it.weather.firstOrNull()?.description ?: "No data",
+            icon = it.weather.firstOrNull()?.icon ?: "01d"
         )
     }
 
@@ -84,15 +84,15 @@ fun mapResponseToData(
         city = current.name,
         country = current.sys.country,
         temperature = "${currentTemp}$temperatureUnit".localizeNumbers(isArabic),
-        description = current.weather[0].description,
+        description = current.weather.firstOrNull()?.description ?: "No data",
         clouds = "${current.clouds.all}".localizeNumbers(isArabic),
         pressure = "${current.main.pressure}".localizeNumbers(isArabic),
-        icon = current.weather[0].icon,
+        icon = current.weather.firstOrNull()?.icon ?: "01d",
         humidity = "${current.main.humidity}%".localizeNumbers(isArabic),
         windSpeed = "${String.format(Locale.ENGLISH, "%.1f", convertedWindSpeed)} $windUnitText".localizeNumbers(isArabic),
         hourlyForecast = hourly,
         dailyForecast = daily,
-        isDay = current.weather[0].icon.contains("d"),
+        isDay = current.weather.firstOrNull()?.icon?.contains("d") ?: true,
         lat = current.coord?.lat ?: 0.0,
         lon = current.coord?.lon ?: 0.0,
         isArabic = isArabic

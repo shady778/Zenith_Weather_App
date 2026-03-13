@@ -127,4 +127,9 @@ dependencies {
     androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
     // مكتبة Turbine بردو بنحتاجها في الـ AndroidTest لو بنختبر الـ DAO اللي بيرجع Flow
     androidTestImplementation("app.cash.turbine:turbine:1.0.0")
+    // مكتبة MockK الأساسية للـ Unit Tests
+    testImplementation ("io.mockk:mockk:1.13.8")
+
+    // لو حابب تستخدم Android MockK (في حالة إنك بتختبر حاجات بتعتمد على الـ Android Framework)
+    androidTestImplementation ("io.mockk:mockk-android:1.13.8")
 }
