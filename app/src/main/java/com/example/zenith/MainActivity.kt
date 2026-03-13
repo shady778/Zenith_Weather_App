@@ -39,20 +39,19 @@ class MainActivity : ComponentActivity() {
 
         val apiService = RetrofitInstance.apiService
         val remoteDataSource = WeatherRemoteDataSource(apiService)
+        val weatherDao = AppDatabase.getDatabase(this).weatherDao()
         val alertDao   = AppDatabase.getDatabase(this).alertDao()
         val favDao = AppDatabase.getDatabase(this).favoriteCityDao()
         val locationProvider = LocationProvider(this)
         val database = AppDatabase.getDatabase(this)
-        val localDataSource = LocalDataSource(favDao, alertDao)
+        val localDataSource = LocalDataSource(favDao, alertDao,weatherDao)
         val settingsDataStore = SettingsDataStore(this)
         val networkMonitor = NetworkMonitor(this)
         val repository = WeatherRepository(
             remoteDataSource,
             locationProvider,
             localDataSource,
-            database.weatherDao(),
             settingsDataStore,
-            LocalDataSource(favDao,alertDao)
         )
         val factory = WeatherViewModelFactory(repository, networkMonitor)
 

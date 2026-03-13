@@ -1,9 +1,7 @@
 package com.example.zenith.data.repo
-
 import com.example.zenith.data.datasource.local.database.AlertEntity
 import com.example.zenith.data.datasource.local.database.FavoriteCityEntity
 import com.example.zenith.data.datasource.local.database.LocalDataSource
-import com.example.zenith.data.datasource.local.database.WeatherDao
 import com.example.zenith.data.datasource.local.database.WeatherEntity
 import com.example.zenith.data.location.LocationProvider
 import com.example.zenith.data.datasource.remote.ForecastResponse
@@ -24,9 +22,7 @@ class WeatherRepository(
     val remoteDataSource: WeatherRemoteDataSource,
     private val locationProvider: LocationProvider,
     private val localDataSource: LocalDataSource,
-    private val weatherDao: WeatherDao,
     val settingsDataStore: SettingsDataStore,
-    val alertLocalDataSource: LocalDataSource
 ) {
 
     suspend fun fetchCurrent(lat: Double, lon: Double, units: String, lang: String): WeatherResponse {
@@ -73,17 +69,17 @@ class WeatherRepository(
         config: WeatherConfig,
         settings: UserSettings
     ): Flow<Result<WeatherData>> = flow {
-        val cached = weatherDao.getWeatherCache().firstOrNull()?.data
+        val cached = localDataSource.weatherCache.firstOrNull()?.data
+
         if (cached != null) {
             emit(Result.success(cached))
         }
-
         try {
             val current = fetchCurrent(lat, lon, config.units, config.lang)
             val forecast = fetchForecast(lat, lon, config.units, config.lang)
 
             val mapped = mapResponseToData(current, forecast, settings)
-            weatherDao.insertWeatherCache(WeatherEntity(data = mapped))
+            localDataSource.insertWeatherCache(WeatherEntity(data = mapped))
             
             emit(Result.success(mapped))
         } catch (e: Exception) {
@@ -117,17 +113,17 @@ class WeatherRepository(
     suspend fun insert(city: FavoriteCityEntity) = localDataSource.insertCity(city)
 
     suspend fun delete(city: FavoriteCityEntity) = localDataSource.deleteCity(city)
-    val allAlerts: Flow<List<AlertEntity>> = alertLocalDataSource.allAlerts
+    val allAlerts: Flow<List<AlertEntity>> = localDataSource.allAlerts
 
     suspend fun insertAlert(alert: AlertEntity) {
-        alertLocalDataSource.insertAlert(alert)
+        localDataSource.insertAlert(alert)
     }
 
     suspend fun deleteAlert(alert: AlertEntity) {
-        alertLocalDataSource.deleteAlert(alert)
+        localDataSource.deleteAlert(alert)
     }
 
     suspend fun getAlertById(id: String): AlertEntity? {
-        return alertLocalDataSource.getAlertById(id)
+        return localDataSource.getAlertById(id)
     }
 }

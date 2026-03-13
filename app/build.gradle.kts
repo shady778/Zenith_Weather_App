@@ -58,6 +58,7 @@ dependencies {
     implementation(libs.play.services.location)
     implementation(libs.androidx.work.runtime.ktx)
     implementation("androidx.core:core-splashscreen:1.0.1")
+    implementation(libs.androidx.junit.ktx)
 
     // 2. Compose BOM (Bill of Materials) - EL MONYAFEESTO
     val composeBom = platform(libs.androidx.compose.bom)
@@ -100,4 +101,30 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
+    testImplementation("junit:junit:4.13.2")
+    // Mockito للتزييف (Mocking) في الـ Unit Tests العادية
+    testImplementation("org.mockito:mockito-core:5.5.0")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.1.0")
+
+    // --- 2. اختبار الكوروتين والـ Flow (مهم جداً ليك) ---
+    // لتشغيل runTest والتحكم في الوقت (Delay)
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+    // Turbine: أسهل مكتبة لاختبار الـ Flow (بتخليك تعمل awaitItem)
+    testImplementation("app.cash.turbine:turbine:1.0.0")
+
+    // --- 3. اختبار الـ Architecture Components (ViewModel & LiveData) ---
+    // عشان الـ InstantTaskExecutorRule اللي بيخلي الكود يشتغل متزامن
+    testImplementation("androidx.arch.core:core-testing:2.2.0")
+
+    // --- 4. اختبار الـ API (Retrofit) ---
+    // MockWebServer بيعمل سيرفر وهمي يبعت JSON لـ Retrofit
+    testImplementation("com.squareup.okhttp3:mockwebserver:4.11.0")
+
+    // --- 5. اختبارات الأندرويد (Instrumented Tests - لـ Room و الـ Context) ---
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    // عشان تقدر تشغل الكوروتين جوه الـ Instrumented Tests
+    androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+    // مكتبة Turbine بردو بنحتاجها في الـ AndroidTest لو بنختبر الـ DAO اللي بيرجع Flow
+    androidTestImplementation("app.cash.turbine:turbine:1.0.0")
 }
