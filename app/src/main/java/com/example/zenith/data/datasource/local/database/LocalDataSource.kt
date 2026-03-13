@@ -2,30 +2,40 @@ package com.example.zenith.data.datasource.local.database
 import kotlinx.coroutines.flow.Flow
 class LocalDataSource(
     private val favoriteCityDao: FavoriteCityDao,
-    private val alertDao: AlertDao
-) {
+    private val alertDao: AlertDao,
+    private val weatherDao: WeatherDao
+) : ILocalDataSource {
 
-    val allFavorites: Flow<List<FavoriteCityEntity>> = favoriteCityDao.getAllFavorites()
+    override val allFavorites: Flow<List<FavoriteCityEntity>> = favoriteCityDao.getAllFavorites()
 
-    suspend fun insertCity(city: FavoriteCityEntity) {
+    override suspend fun insertCity(city: FavoriteCityEntity) {
         favoriteCityDao.insertCity(city)
     }
 
-    suspend fun deleteCity(city: FavoriteCityEntity) {
+    override suspend fun deleteCity(city: FavoriteCityEntity) {
         favoriteCityDao.deleteCity(city)
     }
-    val allAlerts: Flow<List<AlertEntity>> = alertDao.getAllAlerts()
+    override val allAlerts: Flow<List<AlertEntity>> = alertDao.getAllAlerts()
 
-    suspend fun insertAlert(alert: AlertEntity) {
+    override suspend fun insertAlert(alert: AlertEntity) {
         alertDao.insertAlert(alert)
     }
 
-    suspend fun deleteAlert(alert: AlertEntity) {
+    override suspend fun deleteAlert(alert: AlertEntity) {
         alertDao.deleteAlert(alert)
     }
 
-    suspend fun getAlertById(id: String): AlertEntity? {
+    override suspend fun getAlertById(id: String): AlertEntity? {
         return alertDao.getAlertById(id)
+    }
+    override val weatherCache: Flow<WeatherEntity?> = weatherDao.getWeatherCache()
+
+    override suspend fun insertWeatherCache(cache: WeatherEntity) {
+        weatherDao.insertWeatherCache(cache)
+    }
+
+    override suspend fun clearWeatherCache() {
+        weatherDao.clearWeatherCache()
     }
 
 }

@@ -27,20 +27,18 @@ class WeatherWorker(context: Context, params: WorkerParameters) : CoroutineWorke
 
         val database = AppDatabase.getDatabase(applicationContext)
         val alertDao = database.alertDao()
+        val weatherDao = database.weatherDao()
         val favoriteDao = database.favoriteCityDao()
-        val alertLocalDataSource = LocalDataSource(favoriteDao,alertDao)
         val apiService = RetrofitInstance.apiService
         val remoteDataSource = WeatherRemoteDataSource(apiService)
         val locationProvider = LocationProvider(applicationContext)
-        val favoriteLocalDataSource = LocalDataSource(favoriteDao,alertDao)
+        val localDataSource = LocalDataSource(favoriteDao,alertDao,weatherDao)
         val settingsDataStore = SettingsDataStore(applicationContext)
         val weatherRepository = WeatherRepository(
             remoteDataSource,
             locationProvider,
-            favoriteLocalDataSource,
-            database.weatherDao(),
+            localDataSource,
             settingsDataStore,
-            alertLocalDataSource
         )
 
         val notificationHelper = NotificationHelper(applicationContext)
