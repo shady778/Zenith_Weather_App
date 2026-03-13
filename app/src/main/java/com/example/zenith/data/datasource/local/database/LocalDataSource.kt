@@ -3,7 +3,7 @@ import kotlinx.coroutines.flow.Flow
 class LocalDataSource(
     private val favoriteCityDao: FavoriteCityDao,
     private val alertDao: AlertDao,
-    private val weatherDao: WeatherDao
+    private val weatherDao: WeatherDao,
 ) : ILocalDataSource {
 
     override val allFavorites: Flow<List<FavoriteCityEntity>> = favoriteCityDao.getAllFavorites()
