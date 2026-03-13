@@ -23,7 +23,7 @@ class WeatherRepository(
     private val locationProvider: LocationProvider,
     private val localDataSource: LocalDataSource,
     val settingsDataStore: SettingsDataStore,
-) {
+): IWeatherRepository {
 
     suspend fun fetchCurrent(lat: Double, lon: Double, units: String, lang: String): WeatherResponse {
         return remoteDataSource.getCurrentWeather(lat, lon, units, lang)
@@ -33,7 +33,7 @@ class WeatherRepository(
         return remoteDataSource.getForecast(lat, lon, units, lang)
     }
     @OptIn(ExperimentalCoroutinesApi::class)
-    fun getWeatherData(): Flow<Result<WeatherData>> {
+    override fun getWeatherData(): Flow<Result<WeatherData>> {
         return settingsDataStore.settingsFlow.flatMapLatest { settings ->
             val config = prepareWeatherConfig(settings)
 
@@ -90,7 +90,7 @@ class WeatherRepository(
     }
     private data class WeatherConfig(val lang: String, val units: String)
     @OptIn(ExperimentalCoroutinesApi::class)
-    fun getWeatherDataForLocation(lat: Double, lon: Double): Flow<Result<WeatherData>> {
+    override fun getWeatherDataForLocation(lat: Double, lon: Double): Flow<Result<WeatherData>> {
         return settingsDataStore.settingsFlow.flatMapLatest { settings ->
             flow {
                 try {
@@ -108,22 +108,22 @@ class WeatherRepository(
         }
     }
 
-    val allFavorites: Flow<List<FavoriteCityEntity>> = localDataSource.allFavorites
+    override val allFavorites: Flow<List<FavoriteCityEntity>> = localDataSource.allFavorites
 
-    suspend fun insert(city: FavoriteCityEntity) = localDataSource.insertCity(city)
+    override suspend fun insert(city: FavoriteCityEntity) = localDataSource.insertCity(city)
 
-    suspend fun delete(city: FavoriteCityEntity) = localDataSource.deleteCity(city)
-    val allAlerts: Flow<List<AlertEntity>> = localDataSource.allAlerts
+    override suspend fun delete(city: FavoriteCityEntity) = localDataSource.deleteCity(city)
+    override val allAlerts: Flow<List<AlertEntity>> = localDataSource.allAlerts
 
-    suspend fun insertAlert(alert: AlertEntity) {
+    override suspend fun insertAlert(alert: AlertEntity) {
         localDataSource.insertAlert(alert)
     }
 
-    suspend fun deleteAlert(alert: AlertEntity) {
+    override suspend fun deleteAlert(alert: AlertEntity) {
         localDataSource.deleteAlert(alert)
     }
 
-    suspend fun getAlertById(id: String): AlertEntity? {
+    override suspend fun getAlertById(id: String): AlertEntity? {
         return localDataSource.getAlertById(id)
     }
 }
