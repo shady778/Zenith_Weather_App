@@ -114,12 +114,14 @@ class WeatherWorker(context: Context, params: WorkerParameters) : CoroutineWorke
                 val fullScreenIntent = if (isAlarm) {
                     alarmIntent = Intent(applicationContext, AlarmActivity::class.java).apply {
                         flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                        putExtra("ALERT_ID", alert.id)
                         putExtra("ALERT_LABEL", alert.label)
                         putExtra("ALERT_TRIGGER", triggerName)
                         putExtra("TRIGGER_READING", triggerReading)
                         putExtra("WEATHER_DESC", weatherDesc)
                         putExtra("WEATHER_TEMP", "${weather.main.temp}°")
                         putExtra("WEATHER_ICON", weather.weather.firstOrNull()?.icon ?: "01d")
+                        putExtra("REPEAT_MODE", alert.repeat.name)
                         putExtra("IS_ARABIC", isArabic)
                     }
                     PendingIntent.getActivity(

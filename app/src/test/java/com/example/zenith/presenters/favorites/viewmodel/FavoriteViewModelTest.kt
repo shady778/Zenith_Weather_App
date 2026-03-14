@@ -1,9 +1,8 @@
 package com.example.zenith.presenters.favorites.viewmodel
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.zenith.data.datasource.local.database.FavoriteCityEntity
 import com.example.zenith.data.local.datastore.UserSettings
-import com.example.zenith.data.model.WeatherData
+import com.example.zenith.data.network.NetworkMonitor
 import com.example.zenith.data.repo.WeatherRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -19,38 +18,35 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class FavoriteViewModelTest {
 
-    @get:Rule
-    val instantTaskExecutorRule = InstantTaskExecutorRule()
     private val testDispatcher = StandardTestDispatcher()
 
+    // Mock dependencies
     private val repository = mockk<WeatherRepository>(relaxed = true)
+    private val networkMonitor = mockk<NetworkMonitor>(relaxed = true)
+
     private lateinit var viewModel: FavoriteViewModel
 
     @Before
     fun setup() {
         Dispatchers.setMain(testDispatcher)
 
-        every { repository.allFavorites } returns flowOf(emptyList())
+        every { networkMonitor.isConnected } returns flowOf(true)
 
+        every { repository.allFavorites } returns flowOf(emptyList())
         every { repository.settingsDataStore.settingsFlow } returns flowOf(UserSettings(
             tempUnit = "CELSIUS",
             windUnit = "MS",
             language = "ENGLISH",
             locProvider = "GPS",
             notifsEnabled = true,
-            dailyAlerts = false,
-            manualLat = 0.0,
-            manualLon = 0.0
+            dailyAlerts = false
         ))
-
-        viewModel = FavoriteViewModel(repository)
     }
 
     @After
@@ -58,10 +54,14 @@ class FavoriteViewModelTest {
         Dispatchers.resetMain()
     }
 
+    private fun createViewModel() {
+        viewModel = FavoriteViewModel(repository, networkMonitor, testDispatcher)
+    }
+
     @Test
     fun loadFavorites_whenEmpty_emitsEmptyState() = runTest(testDispatcher) {
         every { repository.allFavorites } returns flowOf(emptyList())
-        viewModel = FavoriteViewModel(repository)
+        createViewModel()
 
         advanceUntilIdle()
 
@@ -69,19 +69,24 @@ class FavoriteViewModelTest {
     }
 
     @Test
-    fun viewDetail_onSuccess_updatesDetailState() = runTest(testDispatcher) {
-        val mockData = mockk<WeatherData>(relaxed = true)
-        coEvery { repository.getWeatherDataForLocation(any(), any()) } returns flowOf(Result.success(mockData))
+    fun loadFavorites_whenNetworkOff_emitsSuccessWithOfflineMessage() = runTest(testDispatcher) {
+        val city = FavoriteCityEntity(id = 1, name = "Cairo", lat = 30.0, lon = 31.0, country = "EG")
+        every { repository.allFavorites } returns flowOf(listOf(city))
+        every { networkMonitor.isConnected } returns flowOf(false)
+        coEvery { repository.remoteDataSource.getCurrentWeather(any(), any(), any(), any()) } throws Exception("Offline")
+        
+        createViewModel()
 
-        viewModel.viewDetail(0.0, 0.0)
         advanceUntilIdle()
-
-        val state = viewModel.detailState.value
-        assert(!state.isLoading)
-        assert(state.weatherData == mockData)
+        val state = viewModel.uiState.value
+        assert(state is FavoriteUiState.Success)
+        val cities = (state as FavoriteUiState.Success).cities
+        assert(cities.any { it.description == "Offline" })
     }
+
     @Test
     fun addCity_callsRepositoryInsert() = runTest(testDispatcher) {
+        createViewModel()
         val city = FavoriteCityEntity(id = 1, name = "Cairo", lat = 30.0, lon = 31.0, country = "EG")
 
         viewModel.addCity(city)
@@ -92,8 +97,8 @@ class FavoriteViewModelTest {
 
     @Test
     fun removeCity_callsRepositoryDelete() = runTest(testDispatcher) {
-        val city =
-            FavoriteCityEntity(id = 1, name = "Cairo", lat = 30.0, lon = 31.0, country = "EG")
+        createViewModel()
+        val city = FavoriteCityEntity(id = 1, name = "Cairo", lat = 30.0, lon = 31.0, country = "EG")
 
         viewModel.removeCity(city)
         advanceUntilIdle()

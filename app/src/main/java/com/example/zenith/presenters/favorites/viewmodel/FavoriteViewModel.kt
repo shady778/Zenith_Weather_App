@@ -20,6 +20,9 @@ import kotlinx.coroutines.awaitAll
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlinx.coroutines.launch
+import com.example.zenith.data.network.NetworkMonitor
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
 
 data class FavoriteCity(
     val id: Int,
@@ -74,7 +77,16 @@ data class FavoriteDetailState(
     val error: String? = null
 )
 
-class FavoriteViewModel(private val repository: WeatherRepository) : ViewModel() {
+
+
+class FavoriteViewModel(
+    private val repository: WeatherRepository,
+    private val networkMonitor: NetworkMonitor,
+    private val ioDispatcher: kotlinx.coroutines.CoroutineDispatcher = kotlinx.coroutines.Dispatchers.IO
+) : ViewModel() {
+
+    val isOnline: StateFlow<Boolean> = networkMonitor.isConnected
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
 
     private val _uiState = MutableStateFlow<FavoriteUiState>(FavoriteUiState.Loading)
     val uiState: StateFlow<FavoriteUiState> = _uiState.asStateFlow()
@@ -90,10 +102,11 @@ class FavoriteViewModel(private val repository: WeatherRepository) : ViewModel()
         viewModelScope.launch {
             kotlinx.coroutines.flow.combine(
                 repository.allFavorites,
-                repository.settingsDataStore.settingsFlow
-            ) { entities, settings ->
-                entities to settings
-            }.collect { (entities, settings) ->
+                repository.settingsDataStore.settingsFlow,
+                networkMonitor.isConnected
+            ) { entities, settings, online ->
+                Triple(entities, settings, online)
+            }.collect { (entities, settings, online) ->
                 if (entities.isEmpty()) {
                     _uiState.value = FavoriteUiState.Empty
                 } else {
@@ -104,7 +117,7 @@ class FavoriteViewModel(private val repository: WeatherRepository) : ViewModel()
                     val units = if (tempUnit == "FAHRENHEIT") "imperial" else "metric"
                     
                     val cities = entities.map { entity ->
-                        async(kotlinx.coroutines.Dispatchers.IO) {
+                        async(ioDispatcher) {
                             try {
                                 val response = repository.remoteDataSource.getCurrentWeather(entity.lat, entity.lon, units, langCode)
                                 val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
@@ -131,13 +144,14 @@ class FavoriteViewModel(private val repository: WeatherRepository) : ViewModel()
                                     tempUnit = tempUnit
                                 )
                             } catch (e: Exception) {
+                                val offlineMsg = if (isArabic) "غير متصل" else "Offline"
                                 FavoriteCity(
                                     id = entity.id,
                                     name = entity.name,
                                     country = entity.country,
                                     tempC = 0f,
                                     localTime = "--:--",
-                                    description = "Error: ${e.localizedMessage?.take(12)}",
+                                    description = if (!online) offlineMsg else "Error: ${e.localizedMessage?.take(10)}",
                                     condition = WeatherCondition.Sunny,
                                     entity = entity,
                                     isArabic = isArabic

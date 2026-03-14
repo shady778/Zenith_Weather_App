@@ -3,6 +3,7 @@ package com.example.zenith.presenters.favorites.view
 import android.location.Geocoder
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -24,6 +25,10 @@ import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.views.MapView
 import java.util.Locale
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import android.widget.Toast
 
 @Composable
 fun MapPicker(
@@ -58,20 +63,87 @@ fun MapPicker(
             colors = CardDefaults.cardColors(containerColor = ZenithColors.Background)
         ) {
             Box(modifier = Modifier.fillMaxSize()) {
+                var searchQuery by remember { mutableStateOf("") }
+                val scope = rememberCoroutineScope()
+
                 AndroidView(
                     factory = { mapView },
                     modifier = Modifier.fillMaxSize()
                 )
 
+                // Search Bar
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth(0.9f)
+                        .padding(top = 20.dp)
+                        .align(Alignment.TopCenter),
+                    color = Color.Black.copy(0.6f),
+                    shape = RoundedCornerShape(16.dp),
+                    border = BorderStroke(1.dp, Color.White.copy(0.1f))
+                ) {
+                    TextField(
+                        value = searchQuery,
+                        onValueChange = { searchQuery = it },
+                        placeholder = { 
+                            Text(
+                                if (isArabic) "ابحث عن مدينة..." else "Search for a city...",
+                                color = Color.White.copy(0.5f),
+                                fontSize = 14.sp
+                            ) 
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent,
+                            focusedTextColor = Color.White,
+                            unfocusedTextColor = Color.White,
+                            cursorColor = ZenithColors.Cyan,
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent
+                        ),
+                        leadingIcon = { Icon(Icons.Rounded.Search, null, tint = ZenithColors.Cyan) },
+                        trailingIcon = {
+                            if (searchQuery.isNotEmpty()) {
+                                IconButton(onClick = {
+                                    scope.launch(Dispatchers.IO) {
+                                        try {
+                                            val geocoder = Geocoder(context, if (isArabic) Locale("ar") else Locale.getDefault())
+                                            val results = geocoder.getFromLocationName(searchQuery, 1)
+                                            if (!results.isNullOrEmpty()) {
+                                                val found = results[0]
+                                                withContext(Dispatchers.Main) {
+                                                    mapView.controller.animateTo(org.osmdroid.util.GeoPoint(found.latitude, found.longitude))
+                                                    mapView.controller.setZoom(14.0)
+                                                }
+                                            } else {
+                                                withContext(Dispatchers.Main) {
+                                                    Toast.makeText(context, if(isArabic) "المكان غير موجود" else "Location not found", Toast.LENGTH_SHORT).show()
+                                                }
+                                            }
+                                        } catch (e: Exception) {
+                                            withContext(Dispatchers.Main) {
+                                                Toast.makeText(context, "Search error", Toast.LENGTH_SHORT).show()
+                                            }
+                                        }
+                                    }
+                                }) {
+                                    Icon(Icons.Rounded.CheckCircle, null, tint = ZenithColors.Cyan)
+                                }
+                            }
+                        },
+                        singleLine = true
+                    )
+                }
+
                 IconButton(
                     onClick = onDismiss,
                     modifier = Modifier
                         .padding(20.dp)
-                        .background(ZenithColors.SurfaceGlass, CircleShape)
-                        .border(1.dp, ZenithColors.BorderGlass, CircleShape)
+                        .size(40.dp)
+                        .background(Color.Black.copy(0.4f), CircleShape)
                         .align(Alignment.TopStart)
                 ) {
-                    Icon(Icons.AutoMirrored.Rounded.ArrowBack, null, tint = Color.White)
+                    Icon(Icons.AutoMirrored.Rounded.ArrowBack, null, tint = Color.White, modifier = Modifier.size(20.dp))
                 }
 
                 Column(

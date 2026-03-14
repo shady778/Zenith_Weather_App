@@ -27,6 +27,9 @@ import com.airbnb.lottie.compose.*
 import com.example.zenith.R
 import com.example.zenith.ui.theme.ZenithColors
 import com.example.zenith.ui.theme.ZenithTheme
+import com.example.zenith.data.db.AppDatabase
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 
 class AlarmActivity : ComponentActivity() {
     private var ringtone: android.media.Ringtone? = null
@@ -54,12 +57,14 @@ class AlarmActivity : ComponentActivity() {
         
         enableEdgeToEdge()
         
+        val alertId = intent.getStringExtra("ALERT_ID")
         val alertLabel = intent.getStringExtra("ALERT_LABEL") ?: "Weather Update"
         val alertTrigger = intent.getStringExtra("ALERT_TRIGGER") ?: "Alert"
         val triggerReading = intent.getStringExtra("TRIGGER_READING") ?: ""
         val weatherDesc = intent.getStringExtra("WEATHER_DESC") ?: ""
         val weatherTemp = intent.getStringExtra("WEATHER_TEMP") ?: ""
         val weatherIcon = intent.getStringExtra("WEATHER_ICON") ?: "01d"
+        val repeatMode = intent.getStringExtra("REPEAT_MODE") ?: "EVERY_DAY"
         val isArabic = intent.getBooleanExtra("IS_ARABIC", false)
 
         setContent {
@@ -74,6 +79,15 @@ class AlarmActivity : ComponentActivity() {
                     isArabic = isArabic,
                     onDismiss = { 
                         stopAlarmMedia()
+                        if (repeatMode == com.example.zenith.presenters.alerts.view.RepeatMode.ONCE.name && alertId != null) {
+                            lifecycleScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                                val db = AppDatabase.getDatabase(applicationContext)
+                                val alert = db.alertDao().getAlertById(alertId)
+                                if (alert != null) {
+                                    db.alertDao().deleteAlert(alert)
+                                }
+                            }
+                        }
                         finish() 
                     }
                 )
