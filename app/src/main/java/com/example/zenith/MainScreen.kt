@@ -21,15 +21,17 @@ import com.example.zenith.presenters.alerts.viewmodel.AlertViewModel
 import com.example.zenith.presenters.alerts.viewmodel.AlertViewModelFactory
 import com.example.zenith.presenters.alerts.logic.AlertScheduler
 
+import com.example.zenith.data.network.NetworkMonitor
+
 
 @Composable
-fun MainScreen(weatherViewModel: WeatherViewModel) {
+fun MainScreen(weatherViewModel: WeatherViewModel, networkMonitor: NetworkMonitor) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
     val favoriteViewModel: FavoriteViewModel = viewModel(
-        factory = FavoriteViewModelFactory(weatherViewModel.repository) 
+        factory = FavoriteViewModelFactory(weatherViewModel.repository, networkMonitor) 
     )
 
     val settingsViewModel: SettingsViewModel = viewModel(

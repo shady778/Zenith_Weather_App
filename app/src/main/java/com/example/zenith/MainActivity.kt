@@ -134,7 +134,7 @@ class MainActivity : ComponentActivity() {
                 Crossfade(targetState = splashState, label = "screen_transition") { state ->
                     when (state) {
                         is SplashState.Ready -> {
-                            MainScreen(weatherViewModel = weatherViewModel)
+                            MainScreen(weatherViewModel = weatherViewModel, networkMonitor = networkMonitor)
                         }
                         is SplashState.Error -> {
                             ErrorScreen(

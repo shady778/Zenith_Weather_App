@@ -29,6 +29,11 @@ import com.example.zenith.data.model.WeatherData
 import com.example.zenith.presenters.favorites.viewmodel.FavoriteViewModel
 
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.material.icons.rounded.WifiOff
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FavoritesScreen(
@@ -40,9 +45,11 @@ fun FavoritesScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val detailState by viewModel.detailState.collectAsState()
+    val isOnline by viewModel.isOnline.collectAsState()
+    
     var showMapPicker by remember { mutableStateOf(false) }
     var cityToDelete by remember { mutableStateOf<FavoriteCity?>(null) }
-
+    val context = LocalContext.current
 
     Box(
         modifier = Modifier
@@ -59,7 +66,6 @@ fun FavoritesScreen(
             topBar = {
                 CenterAlignedTopAppBar(
                     title = {
-                        val context = LocalContext.current
                         Text(
                             StringHelper.getString(context, R.string.favorites_title, isArabic),
                             fontWeight = FontWeight.Bold,
@@ -73,52 +79,82 @@ fun FavoritesScreen(
             },
             floatingActionButton = {
                 FloatingActionButton(
-                    onClick = { showMapPicker = true },
-                    containerColor = ZenithColors.Cyan,
-                    contentColor = ZenithColors.Background,
+                    onClick = { if (isOnline) showMapPicker = true },
+                    containerColor = if (isOnline) ZenithColors.Cyan else ZenithColors.TextDisabled,
+                    contentColor = if (isOnline) ZenithColors.Background else Color.Gray,
                     shape = CircleShape,
                     modifier = Modifier.padding(bottom = 16.dp, end = 8.dp)
                 ) {
-                    val context = LocalContext.current
-                    Icon(Icons.Rounded.Add, contentDescription = StringHelper.getString(context, R.string.add_city_desc, isArabic), modifier = Modifier.size(32.dp))
+                    Icon(
+                        if (isOnline) Icons.Rounded.Add else Icons.Rounded.WifiOff, 
+                        contentDescription = StringHelper.getString(context, R.string.add_city_desc, isArabic), 
+                        modifier = Modifier.size(32.dp)
+                    )
                 }
             }
         ) { padding ->
-            Box(modifier = Modifier.padding(padding).fillMaxSize()) {
-                when (val state = uiState) {
-                    is FavoriteUiState.Loading -> {
-                        CircularProgressIndicator(
-                            modifier = Modifier.align(Alignment.Center),
-                            color = ZenithColors.Cyan
-                        )
-                    }
-                    is FavoriteUiState.Empty -> {
-                        EmptyState(isArabic = isArabic, modifier = Modifier.align(Alignment.Center))
-                    }
-                    is FavoriteUiState.Success -> {
-                        LazyColumn(
-                            contentPadding = PaddingValues(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(12.dp),
-                            modifier = Modifier.fillMaxSize()
+            Column(modifier = Modifier.padding(padding).fillMaxSize()) {
+                // Offline Banner
+                AnimatedVisibility(
+                    visible = !isOnline,
+                    enter = expandVertically(),
+                    exit = shrinkVertically()
+                ) {
+                    Surface(
+                        color = Color.Black.copy(alpha = 0.4f),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
                         ) {
-                            items(state.cities) { city ->
-                                CityCard(
-                                    city = city,
-                                    onClick = { 
-                                        onCitySelected(city.entity.lat, city.entity.lon)
-                                    },
-                                    onDelete = { cityToDelete = city }
-                                )
-                            }
-
+                            Icon(Icons.Rounded.WifiOff, null, tint = Color.LightGray, modifier = Modifier.size(16.dp))
+                            Spacer(Modifier.width(8.dp))
+                            Text(
+                                StringHelper.getString(context, R.string.offline_msg, isArabic),
+                                color = Color.LightGray,
+                                fontSize = 12.sp
+                            )
                         }
                     }
-                    is FavoriteUiState.Error -> {
-                        Text(
-                            text = state.message,
-                            color = Color.Red,
-                            modifier = Modifier.align(Alignment.Center)
-                        )
+                }
+
+                Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
+                    when (val state = uiState) {
+                        is FavoriteUiState.Loading -> {
+                            CircularProgressIndicator(
+                                modifier = Modifier.align(Alignment.Center),
+                                color = ZenithColors.Cyan
+                            )
+                        }
+                        is FavoriteUiState.Empty -> {
+                            EmptyState(isArabic = isArabic, modifier = Modifier.align(Alignment.Center))
+                        }
+                        is FavoriteUiState.Success -> {
+                            LazyColumn(
+                                contentPadding = PaddingValues(16.dp),
+                                verticalArrangement = Arrangement.spacedBy(12.dp),
+                                modifier = Modifier.fillMaxSize()
+                            ) {
+                                items(state.cities) { city ->
+                                    CityCard(
+                                        city = city,
+                                        onClick = { 
+                                            onCitySelected(city.entity.lat, city.entity.lon)
+                                        },
+                                        onDelete = { cityToDelete = city }
+                                    )
+                                }
+                            }
+                        }
+                        is FavoriteUiState.Error -> {
+                            Text(
+                                text = state.message,
+                                color = Color.Red,
+                                modifier = Modifier.align(Alignment.Center)
+                            )
+                        }
                     }
                 }
             }

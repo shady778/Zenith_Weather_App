@@ -5,10 +5,18 @@ import androidx.lifecycle.viewModelScope
 import com.example.zenith.data.datasource.local.database.AlertEntity
 import com.example.zenith.data.repo.WeatherRepository
 import com.example.zenith.presenters.alerts.logic.AlertScheduler
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+
+sealed class AlertEvent {
+    object Added : AlertEvent()
+    object Deleted : AlertEvent()
+}
 
 class AlertViewModel(
     private val repository: WeatherRepository,
@@ -22,12 +30,16 @@ class AlertViewModel(
             initialValue = emptyList()
         )
 
+    private val _uiEvent = MutableSharedFlow<AlertEvent>()
+    val uiEvent: SharedFlow<AlertEvent> = _uiEvent.asSharedFlow()
+
     fun addAlert(alert: AlertEntity) {
         viewModelScope.launch {
             repository.insertAlert(alert)
             if (alert.isEnabled) {
                 scheduler.schedule(alert)
             }
+            _uiEvent.emit(AlertEvent.Added)
         }
     }
 
@@ -35,6 +47,7 @@ class AlertViewModel(
         viewModelScope.launch {
             repository.deleteAlert(alert)
             scheduler.cancel(alert)
+            _uiEvent.emit(AlertEvent.Deleted)
         }
     }
 

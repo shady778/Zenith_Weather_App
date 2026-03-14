@@ -13,8 +13,7 @@ sealed class Screen(
     val route: String,
     val label: String,
     val icon: ImageVector,
-    val selectedIcon: ImageVector,
-    val badgeCount: Int = 0
+    val selectedIcon: ImageVector
 ) {
     object Home : Screen(
         route = "home",
