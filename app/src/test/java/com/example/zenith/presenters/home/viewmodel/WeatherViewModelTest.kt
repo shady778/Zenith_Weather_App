@@ -1,0 +1,97 @@
+package com.example.zenith.presenters.home.viewmodel
+
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.example.zenith.data.model.WeatherData
+import com.example.zenith.data.network.NetworkMonitor
+import com.example.zenith.data.repo.WeatherRepository
+import io.mockk.coEvery
+import io.mockk.every
+import io.mockk.mockk
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
+import org.hamcrest.CoreMatchers.`is`
+import org.hamcrest.CoreMatchers.notNullValue
+import org.hamcrest.CoreMatchers.nullValue
+import org.hamcrest.MatcherAssert.assertThat
+import org.junit.After
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
+
+@OptIn(ExperimentalCoroutinesApi::class)
+class WeatherViewModelTest {
+
+    @get:Rule
+    val instantTaskExecutorRule = InstantTaskExecutorRule()
+    private val testDispatcher = StandardTestDispatcher()
+
+    private lateinit var viewModel: WeatherViewModel
+    private val repo = mockk<WeatherRepository>(relaxed = true)
+    private val networkMonitor = mockk<NetworkMonitor>(relaxed = true)
+
+    @Before
+    fun setup() {
+        Dispatchers.setMain(testDispatcher)
+        every { networkMonitor.isConnected } returns flowOf(true)
+        viewModel = WeatherViewModel(repo, networkMonitor)
+    }
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
+    }
+
+    @Test
+    fun fetchWeather_success_updatesUiStateWithData() = runTest(testDispatcher) {
+        val mockData = mockk<WeatherData>(relaxed = true)
+        coEvery { repo.getWeatherData() } returns flowOf(Result.success(mockData))
+
+        viewModel.fetchWeather()
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertThat(state.weatherData, notNullValue())
+        assertThat(state.isLoading, `is`(false))
+        assertThat(state.errorMessage, nullValue())
+    }
+
+    @Test
+    fun fetchWeather_failure_updatesUiStateWithErrorMessage() = runTest(testDispatcher) {
+        val errorMessage = "Network Error"
+        coEvery { repo.getWeatherData() } returns flowOf(Result.failure(Exception(errorMessage)))
+
+        viewModel.fetchWeather()
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertThat(state.errorMessage, `is`(errorMessage))
+        assertThat(state.isLoading, `is`(false))
+    }
+
+    @Test
+    fun triggerNoInternetAlert_setsAlertFlagToTrue() {
+        viewModel.triggerNoInternetAlert()
+        assertThat(viewModel.uiState.value.showNoInternetAlert, `is`(true))
+    }
+
+    @Test
+    fun dismissNoInternetAlert_setsAlertFlagToFalse() {
+        viewModel.dismissNoInternetAlert()
+        assertThat(viewModel.uiState.value.showNoInternetAlert, `is`(false))
+    }
+
+    @Test
+    fun networkDisconnected_updatesUiStateIsOnlineToFalse() = runTest(testDispatcher) {
+        every { networkMonitor.isConnected } returns flowOf(false)
+        val vm = WeatherViewModel(repo, networkMonitor)
+
+        advanceUntilIdle()
+        assertThat(vm.uiState.value.isOnline, `is`(false))
+    }
+}

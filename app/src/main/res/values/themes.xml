@@ -11,10 +11,10 @@
     <style name="Theme.App.Starting" parent="Theme.SplashScreen">
         <!-- Background of the splash screen. -->
         <item name="windowSplashScreenBackground">@color/splash_bg</item>
-        <!-- Icon shown on the splash screen. Default is the app icon. 
-             If we want it to look like our app immediately, we can use a transparent drawable
-             or a smaller version of our logo. -->
-        <item name="windowSplashScreenAnimatedIcon">@android:color/transparent</item>
+        <!-- Zenith logo shown on the system splash screen before the app loads. -->
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_foreground</item>
+        <!-- Icon background color (matches the logo's navy bg). -->
+        <item name="windowSplashScreenIconBackgroundColor">@color/splash_bg</item>
         <!-- Theme to use after the splash screen is done. -->
         <item name="postSplashScreenTheme">@style/Theme.Zenith</item>
     </style>

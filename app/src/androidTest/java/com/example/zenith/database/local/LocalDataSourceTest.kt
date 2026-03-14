@@ -1,5 +1,4 @@
-package com.example.zenith.database
-
+package com.example.zenith.database.local
 import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
@@ -9,11 +8,11 @@ import com.example.zenith.data.datasource.local.database.FavoriteCityEntity
 import com.example.zenith.data.datasource.local.database.LocalDataSource
 import com.example.zenith.data.datasource.local.database.WeatherEntity
 import com.example.zenith.data.db.AppDatabase
-import com.example.zenith.data.model.*
+import com.example.zenith.data.model.WeatherData
 import com.example.zenith.presenters.alerts.view.AlertType
 import com.example.zenith.presenters.alerts.view.RepeatMode
 import com.example.zenith.presenters.alerts.view.WeatherTrigger
-import junit.framework.Assert.*
+import junit.framework.Assert
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -44,7 +43,6 @@ class LocalDataSourceTest {
         db.close()
     }
 
-    // --- Favorites Tests ---
     @Test
     fun insertCity_savesToDatabase() = runTest {
         val city =
@@ -52,8 +50,8 @@ class LocalDataSourceTest {
         localDataSource.insertCity(city)
 
         val list = localDataSource.allFavorites.first()
-        assertEquals(1, list.size)
-        assertEquals("Alexandria", list[0].name)
+        Assert.assertEquals(1, list.size)
+        Assert.assertEquals("Alexandria", list[0].name)
     }
 
     @Test
@@ -67,7 +65,7 @@ class LocalDataSourceTest {
         localDataSource.deleteCity(cityToDelete)
 
         val listAfterDelete = localDataSource.allFavorites.first()
-        assertTrue(listAfterDelete.isEmpty())
+        Assert.assertTrue(listAfterDelete.isEmpty())
     }
 
     @Test
@@ -81,8 +79,8 @@ class LocalDataSourceTest {
         localDataSource.insertAlert(alert)
         val fetched = localDataSource.getAlertById("alert_1")
 
-        assertNotNull(fetched)
-        assertEquals("Test Alert", fetched?.label)
+        Assert.assertNotNull(fetched)
+        Assert.assertEquals("Test Alert", fetched?.label)
     }
 
     @Test
@@ -96,7 +94,7 @@ class LocalDataSourceTest {
         localDataSource.insertAlert(alert)
         localDataSource.deleteAlert(alert)
         val fetched = localDataSource.getAlertById("alert_1")
-        assertNull(fetched)
+        Assert.assertNull(fetched)
     }
 
     @Test
@@ -112,14 +110,14 @@ class LocalDataSourceTest {
         localDataSource.insertWeatherCache(cache)
         val saved = localDataSource.weatherCache.first()
 
-        assertNotNull(saved)
-        assertEquals("Cairo", saved?.data?.city)
+        Assert.assertNotNull(saved)
+        Assert.assertEquals("Cairo", saved?.data?.city)
     }
 
     @Test
     fun clearWeatherCache_setsValueToNull() = runTest {
         localDataSource.clearWeatherCache()
         val result = localDataSource.weatherCache.first()
-        assertNull(result)
+        Assert.assertNull(result)
     }
 }
