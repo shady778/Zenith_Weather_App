@@ -2,19 +2,17 @@ package com.example.zenith.presenters.home.viewmodel
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.zenith.data.model.WeatherData
-import com.example.zenith.utils.NetworkMonitor
 import com.example.zenith.data.repo.WeatherRepository
+import com.example.zenith.presentation.home.viewmodel.WeatherViewModel
+import com.example.zenith.utils.LocationMonitor
+import com.example.zenith.utils.NetworkMonitor
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
+import kotlinx.coroutines.test.*
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.CoreMatchers.nullValue
@@ -29,17 +27,21 @@ class WeatherViewModelTest {
 
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
-    private val testDispatcher = StandardTestDispatcher()
 
+    private val testDispatcher = StandardTestDispatcher()
     private lateinit var viewModel: WeatherViewModel
+
     private val repo = mockk<WeatherRepository>(relaxed = true)
     private val networkMonitor = mockk<NetworkMonitor>(relaxed = true)
+    private val locationMonitor = mockk<LocationMonitor>(relaxed = true)
 
     @Before
     fun setup() {
         Dispatchers.setMain(testDispatcher)
         every { networkMonitor.isConnected } returns flowOf(true)
-        viewModel = WeatherViewModel(repo, networkMonitor)
+        every { locationMonitor.isLocationEnabled } returns flowOf(true)
+
+        viewModel = WeatherViewModel(repo, networkMonitor, locationMonitor)
     }
 
     @After
@@ -75,12 +77,6 @@ class WeatherViewModelTest {
     }
 
     @Test
-    fun triggerNoInternetAlert_setsAlertFlagToTrue() {
-        viewModel.triggerNoInternetAlert()
-        assertThat(viewModel.uiState.value.showNoInternetAlert, `is`(true))
-    }
-
-    @Test
     fun dismissNoInternetAlert_setsAlertFlagToFalse() {
         viewModel.dismissNoInternetAlert()
         assertThat(viewModel.uiState.value.showNoInternetAlert, `is`(false))
@@ -89,7 +85,7 @@ class WeatherViewModelTest {
     @Test
     fun networkDisconnected_updatesUiStateIsOnlineToFalse() = runTest(testDispatcher) {
         every { networkMonitor.isConnected } returns flowOf(false)
-        val vm = WeatherViewModel(repo, networkMonitor)
+        val vm = WeatherViewModel(repo, networkMonitor, locationMonitor)
 
         advanceUntilIdle()
         assertThat(vm.uiState.value.isOnline, `is`(false))

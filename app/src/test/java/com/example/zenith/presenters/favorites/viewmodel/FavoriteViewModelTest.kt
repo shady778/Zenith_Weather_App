@@ -4,6 +4,8 @@ import com.example.zenith.data.datasource.local.database.FavoriteCityEntity
 import com.example.zenith.data.local.datastore.UserSettings
 import com.example.zenith.utils.NetworkMonitor
 import com.example.zenith.data.repo.WeatherRepository
+import com.example.zenith.presentation.favorites.viewmodel.FavoriteUiState
+import com.example.zenith.presentation.favorites.viewmodel.FavoriteViewModel
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -26,7 +28,6 @@ class FavoriteViewModelTest {
 
     private val testDispatcher = StandardTestDispatcher()
 
-    // Mock dependencies
     private val repository = mockk<WeatherRepository>(relaxed = true)
     private val networkMonitor = mockk<NetworkMonitor>(relaxed = true)
 
