@@ -3,10 +3,11 @@ package com.example.zenith.presenters.alerts.viewmodel
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.zenith.data.datasource.local.database.AlertEntity
 import com.example.zenith.data.repo.WeatherRepository
-import com.example.zenith.presenters.alerts.logic.AlertScheduler
-import com.example.zenith.presenters.alerts.view.AlertType
-import com.example.zenith.presenters.alerts.view.RepeatMode
-import com.example.zenith.presenters.alerts.view.WeatherTrigger
+import com.example.zenith.presentation.alerts.logic.AlertScheduler
+import com.example.zenith.presentation.alerts.view.AlertType
+import com.example.zenith.presentation.alerts.view.RepeatMode
+import com.example.zenith.presentation.alerts.view.WeatherTrigger
+import com.example.zenith.presentation.alerts.viewmodel.AlertViewModel
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk

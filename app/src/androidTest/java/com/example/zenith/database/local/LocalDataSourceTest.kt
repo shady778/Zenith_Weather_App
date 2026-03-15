@@ -9,9 +9,9 @@ import com.example.zenith.data.datasource.local.database.LocalDataSource
 import com.example.zenith.data.datasource.local.database.WeatherEntity
 import com.example.zenith.data.db.AppDatabase
 import com.example.zenith.data.model.WeatherData
-import com.example.zenith.presenters.alerts.view.AlertType
-import com.example.zenith.presenters.alerts.view.RepeatMode
-import com.example.zenith.presenters.alerts.view.WeatherTrigger
+import com.example.zenith.presentation.alerts.view.AlertType
+import com.example.zenith.presentation.alerts.view.RepeatMode
+import com.example.zenith.presentation.alerts.view.WeatherTrigger
 import junit.framework.Assert
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first

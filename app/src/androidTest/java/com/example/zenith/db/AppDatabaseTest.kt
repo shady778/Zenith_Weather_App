@@ -14,9 +14,9 @@ import com.example.zenith.data.db.AppDatabase
 import com.example.zenith.data.model.DailyForecast
 import com.example.zenith.data.model.HourlyForecast
 import com.example.zenith.data.model.WeatherData
-import com.example.zenith.presenters.alerts.view.AlertType
-import com.example.zenith.presenters.alerts.view.RepeatMode
-import com.example.zenith.presenters.alerts.view.WeatherTrigger
+import com.example.zenith.presentation.alerts.view.AlertType
+import com.example.zenith.presentation.alerts.view.RepeatMode
+import com.example.zenith.presentation.alerts.view.WeatherTrigger
 import junit.framework.Assert.assertEquals
 import junit.framework.Assert.assertNotNull
 import junit.framework.Assert.assertNull

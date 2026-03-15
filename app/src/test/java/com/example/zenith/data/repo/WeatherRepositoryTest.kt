@@ -11,9 +11,9 @@ import com.example.zenith.data.datasource.remote.WeatherResponse
 import com.example.zenith.data.local.datastore.SettingsDataStore
 import com.example.zenith.data.local.datastore.UserSettings
 import com.example.zenith.data.location.LocationProvider
-import com.example.zenith.presenters.alerts.view.AlertType
-import com.example.zenith.presenters.alerts.view.RepeatMode
-import com.example.zenith.presenters.alerts.view.WeatherTrigger
+import com.example.zenith.presentation.alerts.view.AlertType
+import com.example.zenith.presentation.alerts.view.RepeatMode
+import com.example.zenith.presentation.alerts.view.WeatherTrigger
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every

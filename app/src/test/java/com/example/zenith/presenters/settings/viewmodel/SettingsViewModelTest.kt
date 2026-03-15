@@ -2,6 +2,7 @@ package com.example.zenith.presenters.settings.viewmodel
 
 import com.example.zenith.data.local.datastore.SettingsDataStore
 import com.example.zenith.data.local.datastore.UserSettings
+import com.example.zenith.presentation.settings.viewmodel.SettingsViewModel
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
