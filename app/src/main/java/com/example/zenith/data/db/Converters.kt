@@ -3,9 +3,9 @@ package com.example.zenith.data.db
 import androidx.room.TypeConverter
 import com.example.zenith.data.model.WeatherData
 import com.google.gson.Gson
-import com.example.zenith.presenters.alerts.view.AlertType
-import com.example.zenith.presenters.alerts.view.RepeatMode
-import com.example.zenith.presenters.alerts.view.WeatherTrigger
+import com.example.zenith.presentation.alerts.view.AlertType
+import com.example.zenith.presentation.alerts.view.RepeatMode
+import com.example.zenith.presentation.alerts.view.WeatherTrigger
 
 class Converters {
     private val gson = Gson()

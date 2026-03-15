@@ -107,4 +107,6 @@
     <string name="cancel">إلغاء</string>
     <string name="alert_added_success">تم إضافة التنبيه بنجاح ✓</string>
     <string name="alert_deleted_success">تم حذف التنبيه بنجاح</string>
+    <string name="location_disabled_error">خدمات الموقع معطلة. يرجى تفعيل الـ GPS للمتابعة.</string>
+    <string name="location_permission_error">إذن الوصول للموقع مطلوب لجلب حالة الطقس لموقعك الحالي.</string>
 </resources>

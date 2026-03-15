@@ -2,7 +2,7 @@ package com.example.zenith.presenters.favorites.viewmodel
 
 import com.example.zenith.data.datasource.local.database.FavoriteCityEntity
 import com.example.zenith.data.local.datastore.UserSettings
-import com.example.zenith.data.network.NetworkMonitor
+import com.example.zenith.utils.NetworkMonitor
 import com.example.zenith.data.repo.WeatherRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
