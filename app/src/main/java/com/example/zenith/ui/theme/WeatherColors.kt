@@ -13,10 +13,3 @@ object ZenithColors {
     val TextDisabled = Color(0x66FFFFFF)
 }
 
-object DayColors {
-    val glassWhite = Color(0x77FFFFFF)
-}
-
-object NightColors {
-    val glassWhite = Color(0x22FFFFFF)
-}

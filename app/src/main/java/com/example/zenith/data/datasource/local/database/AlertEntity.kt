@@ -2,9 +2,9 @@ package com.example.zenith.data.datasource.local.database
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.example.zenith.presenters.alerts.view.AlertType
-import com.example.zenith.presenters.alerts.view.RepeatMode
-import com.example.zenith.presenters.alerts.view.WeatherTrigger
+import com.example.zenith.presentation.alerts.view.AlertType
+import com.example.zenith.presentation.alerts.view.RepeatMode
+import com.example.zenith.presentation.alerts.view.WeatherTrigger
 
 @Entity(tableName = "alerts")
 data class AlertEntity(

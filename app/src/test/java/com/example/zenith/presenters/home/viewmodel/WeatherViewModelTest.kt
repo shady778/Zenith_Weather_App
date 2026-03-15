@@ -2,7 +2,7 @@ package com.example.zenith.presenters.home.viewmodel
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.zenith.data.model.WeatherData
-import com.example.zenith.data.network.NetworkMonitor
+import com.example.zenith.utils.NetworkMonitor
 import com.example.zenith.data.repo.WeatherRepository
 import io.mockk.coEvery
 import io.mockk.every

@@ -8,24 +8,28 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.zenith.presenters.home.viewmodel.WeatherViewModel
-import com.example.zenith.presenters.navigation.ZenithNavGraph
-import com.example.zenith.presenters.navigation.ZenithBottomNav
-import com.example.zenith.presenters.favorites.viewmodel.FavoriteViewModel
-import com.example.zenith.presenters.favorites.viewmodel.FavoriteViewModelFactory
+import com.example.zenith.presentation.home.viewmodel.WeatherViewModel
+import com.example.zenith.presentation.navigation.ZenithNavGraph
+import com.example.zenith.presentation.navigation.ZenithBottomNav
+import com.example.zenith.presentation.favorites.viewmodel.FavoriteViewModel
+import com.example.zenith.presentation.favorites.viewmodel.FavoriteViewModelFactory
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.zenith.data.local.datastore.SettingsDataStore
-import com.example.zenith.presenters.settings.viewmodel.SettingsViewModel
-import com.example.zenith.presenters.settings.viewmodel.SettingsViewModelFactory
-import com.example.zenith.presenters.alerts.viewmodel.AlertViewModel
-import com.example.zenith.presenters.alerts.viewmodel.AlertViewModelFactory
-import com.example.zenith.presenters.alerts.logic.AlertScheduler
+import com.example.zenith.presentation.settings.viewmodel.SettingsViewModel
+import com.example.zenith.presentation.settings.viewmodel.SettingsViewModelFactory
+import com.example.zenith.presentation.alerts.viewmodel.AlertViewModel
+import com.example.zenith.presentation.alerts.viewmodel.AlertViewModelFactory
+import com.example.zenith.presentation.alerts.logic.AlertScheduler
 
-import com.example.zenith.data.network.NetworkMonitor
+import com.example.zenith.utils.NetworkMonitor
 
 
 @Composable
-fun MainScreen(weatherViewModel: WeatherViewModel, networkMonitor: NetworkMonitor) {
+fun MainScreen(
+    weatherViewModel: WeatherViewModel, 
+    settingsViewModel: SettingsViewModel,
+    networkMonitor: NetworkMonitor
+) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -34,11 +38,6 @@ fun MainScreen(weatherViewModel: WeatherViewModel, networkMonitor: NetworkMonito
         factory = FavoriteViewModelFactory(weatherViewModel.repository, networkMonitor) 
     )
 
-    val settingsViewModel: SettingsViewModel = viewModel(
-        factory = SettingsViewModelFactory(
-            SettingsDataStore(LocalContext.current)
-        )
-    )
 
     val context = LocalContext.current
     val alertViewModel: AlertViewModel = viewModel(

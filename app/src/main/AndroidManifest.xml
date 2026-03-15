@@ -36,7 +36,7 @@
         </activity>
 
         <activity
-            android:name=".presenters.alerts.logic.AlarmActivity"
+            android:name=".presentation.alerts.logic.AlarmActivity"
             android:exported="false"
             android:showOnLockScreen="true"
             android:showWhenLocked="true"
@@ -44,7 +44,7 @@
             android:theme="@style/Theme.Zenith.Transparent" />
 
         <receiver
-            android:name=".presenters.alerts.logic.AlertReceiver"
+            android:name=".presentation.alerts.logic.AlertReceiver"
             android:enabled="true"
             android:exported="false" />
 
